@@ -15,8 +15,28 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
-// Middleware
-app.use(cors());
+// CORS Configuration for Production
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000', 
+  'https://shoes-site-padvyk.vercel.app',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Make uploads folder static
@@ -25,8 +45,9 @@ app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 // Socket.io Setup
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow all for now, lock down in production
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
