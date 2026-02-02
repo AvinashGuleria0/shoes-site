@@ -6,7 +6,20 @@ const AdminLog = require('../models/AdminLog');
 // @access  Public
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const keyword = req.query.keyword
+      ? {
+          name: {
+            $regex: req.query.keyword,
+            $options: 'i',
+          },
+        }
+      : {};
+
+    const categoryQuery = req.query.category && req.query.category !== 'All'
+      ? { category: req.query.category }
+      : {};
+
+    const products = await Product.find({ ...keyword, ...categoryQuery });
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -66,39 +79,42 @@ const createProduct = async (req, res) => {
 // @route   PUT /api/products/:id
 // @access  Private/Admin
 const updateProduct = async (req, res) => {
-  const {
-    name,
-    price,
-    description,
-    images, // Object { front, side, back }
-    category,
-    sizes,
-  } = req.body;
+  try {
+    const {
+      name,
+      price,
+      description,
+      images, // Object { front, side, back }
+      category,
+      sizes,
+    } = req.body;
 
-  const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id);
 
-  if (product) {
-    product.name = name || product.name;
-    product.price = price || product.price;
-    product.description = description || product.description;
-    product.images = images || product.images;
-    product.category = category || product.category;
-    product.sizes = sizes || product.sizes;
+    if (product) {
+      product.name = name || product.name;
+      product.price = price || product.price;
+      product.description = description || product.description;
+      product.images = images || product.images;
+      product.category = category || product.category;
+      product.sizes = sizes || product.sizes;
 
-    const updatedProduct = await product.save();
-    
-    // Log Action
-    await AdminLog.create({
-      adminId: req.user._id,
-      actionType: 'UPDATE_PRODUCT',
-      targetDocument: updatedProduct._id.toString(),
-      details: `Updated product: ${updatedProduct.name}`
-    });
+      const updatedProduct = await product.save();
+      
+      // Log Action
+      await AdminLog.create({
+        adminId: req.user._id,
+        actionType: 'UPDATE_PRODUCT',
+        targetDocument: updatedProduct._id.toString(),
+        details: `Updated product: ${updatedProduct.name}`
+      });
 
-    res.json(updatedProduct);
-  } else {
-    res.status(404);
-    throw new Error('Product not found');
+      res.json(updatedProduct);
+    } else {
+      res.status(404).json({ message: 'Product not found' });
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 };
 

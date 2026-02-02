@@ -47,9 +47,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-deep-void">
-      <div className="bg-white dark:bg-zinc-900 p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 className="text-3xl font-bold mb-6 text-center text-gray-800 dark:text-white">Sign In</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-deep-void px-4 py-20">
+      <div className="bg-white dark:bg-zinc-900 p-6 sm:p-8 rounded-xl sm:rounded-lg shadow-lg w-full max-w-md">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-gray-800 dark:text-white">Sign In</h1>
         
         {/* GOOGLE AUTH */}
         <div className="flex justify-center mb-6">
@@ -65,41 +65,41 @@ const LoginPage = () => {
         
         <div className="flex items-center my-4">
             <div className="flex-1 border-t border-gray-300 dark:border-gray-700"></div>
-            <span className="px-3 text-gray-500 text-sm">Or with email</span>
+            <span className="px-3 text-gray-500 text-xs sm:text-sm">Or with email</span>
             <div className="flex-1 border-t border-gray-300 dark:border-gray-700"></div>
         </div>
 
         <form onSubmit={submitHandler}>
 
           <div className="mb-4">
-            <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Email Address</label>
+            <label className="block text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-bold mb-2">Email Address</label>
             <input
               type="email"
               placeholder="Enter email"
-              className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
+              className="w-full px-3 py-2.5 sm:py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-sm"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="mb-6">
-            <label className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Password</label>
+            <label className="block text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-bold mb-2">Password</label>
             <input
               type="password"
               placeholder="Enter password"
-              className="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white"
+              className="w-full px-3 py-2.5 sm:py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-zinc-800 dark:border-zinc-700 dark:text-white text-sm"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-black text-white dark:bg-white dark:text-black font-bold py-2 px-4 rounded hover:opacity-90 transition-opacity"
+            className="w-full bg-black text-white dark:bg-white dark:text-black font-bold py-3 sm:py-2 px-4 rounded-lg hover:opacity-90 transition-opacity text-sm sm:text-base"
           >
             Sign In
           </button>
         </form>
 
-        <div className="mt-4 text-center">
+        <div className="mt-4 text-center text-sm">
             <span className="text-gray-600 dark:text-gray-400">New Customer? </span>
             <Link to={redirect ? `/register?redirect=${redirect}` : '/register'} className="text-blue-500 hover:text-blue-700 font-bold">
                 Register

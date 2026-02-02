@@ -15,23 +15,23 @@ const createAdmin = async () => {
     const userExists = await User.findOne({ email: adminEmail });
 
     if (userExists) {
-      userExists.role = 'admin';
+      userExists.role = 'superadmin';
       await userExists.save();
-      console.log('User updated to Admin');
+      console.log('User updated to Super Admin');
     } else {
       const adminUser = new User({
-        name: 'Admin User',
+        name: 'Super Admin',
         email: adminEmail,
         password: adminPassword,
         phone: '1234567890',
-        role: 'admin'
+        role: 'superadmin'
       });
       // Password hashing is handled in User.js pre-save hook
       await adminUser.save();
-      console.log('Admin User Created');
+      console.log('Super Admin User Created');
     }
 
-    console.log(`\nDefault Admin Credentials:\nEmail: ${adminEmail}\nPassword: ${adminPassword}\n`);
+    console.log(`\nDefault Super Admin Credentials:\nEmail: ${adminEmail}\nPassword: ${adminPassword}\n`);
     
     process.exit();
   } catch (error) {

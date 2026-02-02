@@ -174,11 +174,54 @@ const getAdmins = async (req, res) => {
   res.json(admins);
 };
 
+// @desc    Update user status (Active/Inactive)
+// @route   PUT /api/users/:id/status
+// @access  Private/SuperAdmin
+const updateUserStatus = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
+      user.isActive = req.body.isActive;
+      const updatedUser = await user.save();
+      res.json({ message: `User status updated to ${updatedUser.isActive}` });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Delete user
+// @route   DELETE /api/users/:id
+// @access  Private/SuperAdmin
+const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
+      if (user.role === 'superadmin') {
+         res.status(400).json({ message: 'Cannot delete Super Admin' });
+         return;
+      }
+      await user.deleteOne();
+      res.json({ message: 'User removed' });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   authUser,
   registerUser,
   sendOtp,
   googleLogin,
   addAdminUser,
-  getAdmins
+  getAdmins,
+  updateUserStatus,
+  deleteUser
 };

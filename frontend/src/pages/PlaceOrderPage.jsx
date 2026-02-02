@@ -162,51 +162,51 @@ const PlaceOrderPage = () => {
   };
 
   return (
-    <div className="pt-24 px-6 md:px-20 min-h-screen bg-gray-50 dark:bg-deep-void text-gray-800 dark:text-white pb-20">
-      <h1 className="text-3xl font-black uppercase mb-8">Place Order</h1>
+    <div className="pt-20 sm:pt-24 px-4 sm:px-6 md:px-20 min-h-screen bg-gray-50 dark:bg-deep-void text-gray-800 dark:text-white pb-20">
+      <h1 className="text-2xl sm:text-3xl font-black uppercase mb-6 sm:mb-8">Place Order</h1>
       
-      <div className="flex flex-col lg:flex-row gap-10">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
         {/* LEFT COLUMN: DETAILS */}
-        <div className="flex-1 space-y-6">
+        <div className="flex-1 space-y-4 sm:space-y-6">
             
             {/* ADDRESS */}
-             <div className="bg-white dark:bg-zinc-900 p-6 rounded shadow">
-                <h2 className="text-xl font-bold mb-4">Shipping</h2>
-                <p>
+             <div className="bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl sm:rounded shadow">
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Shipping</h2>
+                <p className="text-sm sm:text-base leading-relaxed">
                     {cart.shippingAddress.address}, {cart.shippingAddress.city}, {cart.shippingAddress.postalCode}, {cart.shippingAddress.country}
                 </p>
              </div>
 
              {/* PAYMENT METHOD */}
-             <div className="bg-white dark:bg-zinc-900 p-6 rounded shadow">
-                <h2 className="text-xl font-bold mb-4">Payment Method</h2>
+             <div className="bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl sm:rounded shadow">
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Payment Method</h2>
                 <p className="flex items-center gap-2">
-                    <span className="px-3 py-1 bg-black text-white dark:bg-white dark:text-black rounded-full text-sm font-bold uppercase">
+                    <span className="px-3 py-1 bg-black text-white dark:bg-white dark:text-black rounded-full text-xs sm:text-sm font-bold uppercase">
                         {cart.paymentMethod}
                     </span>
                 </p>
              </div>
 
              {/* ITEMS */}
-             <div className="bg-white dark:bg-zinc-900 p-6 rounded shadow">
-                <h2 className="text-xl font-bold mb-4">Order Items</h2>
+             <div className="bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl sm:rounded shadow">
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Order Items</h2>
                 {cart.cartItems.length === 0 ? <p>Cart is empty</p> : (
                     <div className="space-y-4">
                         {cart.cartItems.map((item, index) => (
-                            <div key={index} className="flex justify-between items-center border-b border-gray-200 dark:border-gray-700 pb-2">
-                                <div className="flex items-center gap-4">
+                            <div key={index} className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-gray-200 dark:border-gray-700 pb-3 gap-2 sm:gap-0">
+                                <div className="flex items-center gap-3 sm:gap-4">
                                     <img 
                                       src={item.images?.side?.startsWith('http') ? item.images.side : `${import.meta.env.VITE_API_URL}${item.images?.side}`} 
                                       alt={item.name} 
-                                      className="w-12 h-12 object-contain"
+                                      className="w-10 h-10 sm:w-12 sm:h-12 object-contain flex-shrink-0"
                                       onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=200&q=80' }}
                                     />
-                                    <div>
-                                        <p className="font-semibold">{item.name}</p>
+                                    <div className="min-w-0">
+                                        <p className="font-semibold text-sm sm:text-base truncate">{item.name}</p>
                                         <p className="text-xs text-gray-500">Size: {item.size}</p>
                                     </div>
                                 </div>
-                                <span className="font-bold">{item.qty} x ₹{item.price} = ₹{item.qty * item.price}</span>
+                                <span className="font-bold text-sm sm:text-base ml-13 sm:ml-0">{item.qty} x ₹{item.price} = ₹{item.qty * item.price}</span>
                             </div>
                         ))}
                     </div>
@@ -215,22 +215,22 @@ const PlaceOrderPage = () => {
         </div>
 
         {/* RIGHT COLUMN: SUMMARY */}
-        <div className="lg:w-1/3 bg-white dark:bg-zinc-900 p-8 rounded shadow h-fit">
-            <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
-            <div className="space-y-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
-                <div className="flex justify-between">
+        <div className="lg:w-1/3 bg-white dark:bg-zinc-900 p-5 sm:p-8 rounded-xl sm:rounded shadow h-fit">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Order Summary</h2>
+            <div className="space-y-3 mb-4 sm:mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+                <div className="flex justify-between text-sm sm:text-base">
                     <span>Items</span>
                     <span>₹{itemsPrice}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-sm sm:text-base">
                     <span>Shipping</span>
                     <span>₹{shippingPrice}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between text-sm sm:text-base">
                     <span>Tax (18%)</span>
                     <span>₹{taxPrice}</span>
                 </div>
-                <div className="flex justify-between font-bold text-xl pt-2">
+                <div className="flex justify-between font-bold text-lg sm:text-xl pt-2">
                     <span>Total</span>
                     <span>₹{totalPrice}</span>
                 </div>
@@ -238,14 +238,14 @@ const PlaceOrderPage = () => {
             
             <button
                 onClick={placeOrderHandler}
-                className="w-full py-4 bg-black text-white dark:bg-white dark:text-black font-black uppercase tracking-widest hover:opacity-90 rounded-full transition-all transform active:scale-95 text-lg"
+                className="w-full py-3 sm:py-4 bg-black text-white dark:bg-white dark:text-black font-black uppercase tracking-widest hover:opacity-90 rounded-full transition-all transform active:scale-95 text-sm sm:text-lg"
             >
                 {cart.paymentMethod === 'COD' ? 'Confirm Order' : 'Proceed to Payment'}
             </button>
 
             <button
                 onClick={() => navigate('/payment')}
-                className="w-full mt-3 text-center text-gray-500 hover:text-black dark:hover:text-white underline text-sm"
+                className="w-full mt-3 text-center text-gray-500 hover:text-black dark:hover:text-white underline text-xs sm:text-sm"
             >
                 ← Change Payment Method
             </button>

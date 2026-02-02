@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { FaUserShield, FaPlus } from 'react-icons/fa';
+import { FaUserShield, FaPlus, FaTrash, FaToggleOn, FaToggleOff } from 'react-icons/fa';
 
 const ManageAdminsPage = () => {
     const [admins, setAdmins] = useState([]);
@@ -25,6 +25,35 @@ const ManageAdminsPage = () => {
             setAdmins(data);
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to fetch admins');
+        }
+    };
+
+    const toggleStatusHandler = async (id, currentStatus) => {
+        if (!window.confirm(`Are you sure you want to make this user ${currentStatus ? 'Inactive' : 'Active'}?`)) return;
+        try {
+            await axios.put(
+                `${import.meta.env.VITE_API_URL}/api/users/${id}/status`,
+                { isActive: !currentStatus },
+                { headers: { Authorization: `Bearer ${userInfo.token}` } }
+            );
+            toast.success('Status updated');
+            fetchAdmins();
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Update failed');
+        }
+    };
+
+    const deleteHandler = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this admin?')) return;
+        try {
+            await axios.delete(
+                `${import.meta.env.VITE_API_URL}/api/users/${id}`,
+                { headers: { Authorization: `Bearer ${userInfo.token}` } }
+            );
+            toast.success('Admin deleted');
+            fetchAdmins();
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Delete failed');
         }
     };
 
@@ -107,7 +136,9 @@ const ManageAdminsPage = () => {
                             <tr className="bg-gray-200 dark:bg-zinc-800 text-left text-sm uppercase tracking-wider">
                                 <th className="p-4 rounded-tl-lg">NAME</th>
                                 <th className="p-4">EMAIL</th>
-                                <th className="p-4 rounded-tr-lg">ROLE</th>
+                                <th className="p-4">ROLE</th>
+                                <th className="p-4">STATUS</th>
+                                <th className="p-4 rounded-tr-lg">ACTIONS</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -119,6 +150,31 @@ const ManageAdminsPage = () => {
                                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${admin.role === 'superadmin' ? 'bg-purple-500 text-white' : 'bg-blue-500 text-white'}`}>
                                             {admin.role.toUpperCase()}
                                         </span>
+                                    </td>
+                                    <td className="p-4">
+                                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${admin.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                            {admin.isActive !== false ? 'ACTIVE' : 'INACTIVE'}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 flex items-center gap-3">
+                                        {admin.role !== 'superadmin' && (
+                                            <>
+                                                <button 
+                                                    onClick={() => toggleStatusHandler(admin._id, admin.isActive !== false)}
+                                                    className="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
+                                                    title="Toggle Status"
+                                                >
+                                                    {admin.isActive !== false ? <FaToggleOn size={24} className="text-green-500" /> : <FaToggleOff size={24} className="text-gray-400" />}
+                                                </button>
+                                                <button 
+                                                    onClick={() => deleteHandler(admin._id)}
+                                                    className="text-red-500 hover:text-red-700"
+                                                    title="Delete Admin"
+                                                >
+                                                    <FaTrash />
+                                                </button>
+                                            </>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

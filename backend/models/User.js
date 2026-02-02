@@ -12,6 +12,7 @@ const userSchema = mongoose.Schema({
     enum: ['user', 'admin', 'superadmin'], 
     default: 'user' 
   },
+  isActive: { type: Boolean, default: true },
   addresses: [{ 
     street: String, 
     city: String, 

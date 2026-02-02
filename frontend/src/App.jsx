@@ -11,6 +11,8 @@ import RegisterPage from './pages/RegisterPage';
 import ShippingPage from './pages/ShippingPage';
 import PaymentPage from './pages/PaymentPage';
 import PlaceOrderPage from './pages/PlaceOrderPage';
+import ProfilePage from './pages/ProfilePage';
+import WishlistPage from './pages/WishlistPage';
 import AdminRoute from './components/AdminRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import OrderListPage from './pages/admin/OrderListPage';
@@ -18,6 +20,7 @@ import ProductListPage from './pages/admin/ProductListPage';
 import ProductEditPage from './pages/admin/ProductEditPage';
 import ManageAdminsPage from './pages/admin/ManageAdminsPage';
 import OrderDetailsPage from './pages/admin/OrderDetailsPage';
+import UserOrderDetailsPage from './pages/UserOrderDetailsPage';
 
 function App() {
   return (
@@ -34,6 +37,9 @@ function App() {
           <Route path="/shipping" element={<ShippingPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/placeorder" element={<PlaceOrderPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/order/:id" element={<UserOrderDetailsPage />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminRoute />}>
