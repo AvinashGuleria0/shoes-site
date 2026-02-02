@@ -12,10 +12,18 @@ const OrderDetailsPage = () => {
     const [statusLoading, setStatusLoading] = useState(false);
     const [cancellationNote, setCancellationNote] = useState('');
     const [showCancelModal, setShowCancelModal] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
 
     const { userInfo } = useSelector(state => state.auth);
 
     const updateStatusHandler = async (status) => {
+        // If marking as delivered and order is unpaid, show payment modal first
+        if (status === 'Delivered' && !order.isPaid) {
+            setShowPaymentModal(true);
+            return;
+        }
+
         setStatusLoading(true);
         try {
             const { data } = await axios.put(
@@ -26,6 +34,39 @@ const OrderDetailsPage = () => {
             setOrder(data);
             toast.success(`Order status updated to ${status}`);
             setShowCancelModal(false);
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Update failed');
+        } finally {
+            setStatusLoading(false);
+        }
+    };
+
+    const confirmPaymentAndDeliver = async () => {
+        if (!selectedPaymentMethod) {
+            toast.error('Please select a payment method');
+            return;
+        }
+
+        setStatusLoading(true);
+        try {
+            // First mark as paid with the selected payment method
+            await axios.put(
+                `${import.meta.env.VITE_API_URL}/api/orders/${orderId}/pay`,
+                { paymentMethod: selectedPaymentMethod },
+                { headers: { Authorization: `Bearer ${userInfo.token}` } }
+            );
+
+            // Then update status to delivered
+            const { data: deliveredOrder } = await axios.put(
+                `${import.meta.env.VITE_API_URL}/api/orders/${orderId}/status`,
+                { status: 'Delivered' },
+                { headers: { Authorization: `Bearer ${userInfo.token}` } }
+            );
+
+            setOrder(deliveredOrder);
+            toast.success('Payment confirmed and order marked as delivered!');
+            setShowPaymentModal(false);
+            setSelectedPaymentMethod('');
         } catch (error) {
             toast.error(error.response?.data?.message || 'Update failed');
         } finally {
@@ -205,6 +246,75 @@ const OrderDetailsPage = () => {
                                 className="flex-1 py-3 font-bold bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50"
                             >
                                 {statusLoading ? 'Processing...' : 'Cancel Now'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Payment Confirmation Modal */}
+            {showPaymentModal && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-6 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-zinc-900 w-full max-w-md p-8 rounded-2xl">
+                        <h2 className="text-2xl font-black uppercase mb-4">Confirm Payment</h2>
+                        <p className="text-gray-500 mb-6 font-medium">This order is unpaid. Please confirm the payment method received before marking as delivered.</p>
+                        
+                        <div className="space-y-3 mb-6">
+                            <button
+                                onClick={() => setSelectedPaymentMethod('Cash')}
+                                className={`w-full p-4 rounded-xl font-bold text-left border-2 transition-all ${
+                                    selectedPaymentMethod === 'Cash'
+                                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
+                                        : 'border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700'
+                                }`}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <div className="text-lg font-black">Cash</div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">Cash on Delivery</div>
+                                    </div>
+                                    {selectedPaymentMethod === 'Cash' && (
+                                        <FaCheckCircle className="text-green-500 text-xl" />
+                                    )}
+                                </div>
+                            </button>
+
+                            <button
+                                onClick={() => setSelectedPaymentMethod('UPI')}
+                                className={`w-full p-4 rounded-xl font-bold text-left border-2 transition-all ${
+                                    selectedPaymentMethod === 'UPI'
+                                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
+                                        : 'border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700'
+                                }`}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <div className="text-lg font-black">UPI</div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">UPI Payment</div>
+                                    </div>
+                                    {selectedPaymentMethod === 'UPI' && (
+                                        <FaCheckCircle className="text-green-500 text-xl" />
+                                    )}
+                                </div>
+                            </button>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <button 
+                                onClick={() => {
+                                    setShowPaymentModal(false);
+                                    setSelectedPaymentMethod('');
+                                }}
+                                className="flex-1 py-3 font-bold border dark:border-zinc-800 rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                onClick={confirmPaymentAndDeliver}
+                                disabled={!selectedPaymentMethod || statusLoading}
+                                className="flex-1 py-3 font-bold bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50"
+                            >
+                                {statusLoading ? 'Processing...' : 'Confirm & Deliver'}
                             </button>
                         </div>
                     </div>
