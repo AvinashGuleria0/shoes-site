@@ -80,11 +80,39 @@ const addOrderItems = async (req, res) => {
 // @route   POST /api/orders/:id/pay
 // @access  Private
 const updateOrderToPaid = async (req, res) => {
-  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+  const { razorpay_payment_id, razorpay_order_id, razorpay_signature, paymentMethod } = req.body;
   
   const order = await Order.findById(req.params.id);
 
   if (order) {
+    // Manual payment by admin (Cash/UPI)
+    if (paymentMethod && (paymentMethod === 'Cash' || paymentMethod === 'UPI')) {
+      order.isPaid = true;
+      order.paidAt = Date.now();
+      order.paymentMethod = paymentMethod; // Update payment method
+      order.paymentResult = {
+        id: `manual_${Date.now()}`,
+        status: 'success',
+        update_time: Date.now(),
+        email_address: req.user.email,
+        method: paymentMethod
+      };
+
+      const updatedOrder = await order.save();
+
+      // Log Action
+      await AdminLog.create({
+        adminId: req.user._id,
+        actionType: 'ORDER_PAID',
+        targetDocument: updatedOrder._id.toString(),
+        details: `Order ${updatedOrder._id} manually marked as paid via ${paymentMethod}`
+      });
+
+      res.json(updatedOrder);
+      return;
+    }
+
+    // Razorpay payment verification
     // Verify Signature (If not using mock)
     if (process.env.RAZORPAY_KEY_SECRET !== 'placeholder') {
         const body = razorpay_order_id + "|" + razorpay_payment_id;

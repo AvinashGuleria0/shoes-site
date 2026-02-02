@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { FaSearch, FaFilter } from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 
 const OrderListPage = () => {
     const [orders, setOrders] = useState([]);
@@ -42,10 +42,8 @@ const OrderListPage = () => {
 
         // 2. Status Filter
         if (statusFilter !== 'All') {
-            if (statusFilter === 'Not Paid') {
-                tempOrders = tempOrders.filter(order => !order.isPaid);
-            } else if (statusFilter === 'Paid') {
-                tempOrders = tempOrders.filter(order => order.isPaid);
+            if (statusFilter === 'Completed') {
+                tempOrders = tempOrders.filter(order => order.status === 'Delivered');
             } else {
                 tempOrders = tempOrders.filter(order => order.status === statusFilter);
             }
@@ -56,12 +54,12 @@ const OrderListPage = () => {
 
     return (
         <div className="pb-20">
-            <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-                <h2 className="text-3xl font-black uppercase tracking-tight">Order Management</h2>
-                
-                <div className="flex gap-4 w-full md:w-auto">
+            <div className="flex flex-col gap-6 mb-8">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <h2 className="text-3xl font-black uppercase tracking-tight">Order Management</h2>
+                    
                     {/* Search */}
-                    <div className="relative flex-1 md:w-64">
+                    <div className="relative flex-1 sm:flex-none sm:w-64">
                         <FaSearch className="absolute left-3 top-3 text-gray-400" />
                         <input 
                             type="text" 
@@ -71,24 +69,60 @@ const OrderListPage = () => {
                             className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 border-none focus:ring-2 ring-black dark:ring-white outline-none"
                         />
                     </div>
-                    
-                    {/* Filter */}
-                    <div className="relative">
-                        <FaFilter className="absolute left-3 top-3 text-gray-400" />
-                        <select 
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="pl-10 pr-8 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 border-none focus:ring-2 ring-black dark:ring-white outline-none appearance-none cursor-pointer font-bold"
-                        >
-                            <option value="All">All Status</option>
-                            <option value="Paid">Paid</option>
-                            <option value="Not Paid">Not Paid</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Shipped">Shipped</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="Cancelled">Cancelled</option>
-                        </select>
-                    </div>
+                </div>
+                
+                {/* Filter Buttons */}
+                <div className="flex flex-wrap gap-3">
+                    <button
+                        onClick={() => setStatusFilter('All')}
+                        className={`px-6 py-2 rounded-lg font-bold uppercase text-sm tracking-wide transition-all ${
+                            statusFilter === 'All'
+                                ? 'bg-black text-white dark:bg-white dark:text-black'
+                                : 'bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
+                        }`}
+                    >
+                        All
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('Processing')}
+                        className={`px-6 py-2 rounded-lg font-bold uppercase text-sm tracking-wide transition-all ${
+                            statusFilter === 'Processing'
+                                ? 'bg-black text-white dark:bg-white dark:text-black'
+                                : 'bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
+                        }`}
+                    >
+                        Processing
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('Shipped')}
+                        className={`px-6 py-2 rounded-lg font-bold uppercase text-sm tracking-wide transition-all ${
+                            statusFilter === 'Shipped'
+                                ? 'bg-black text-white dark:bg-white dark:text-black'
+                                : 'bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
+                        }`}
+                    >
+                        Shipped
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('Completed')}
+                        className={`px-6 py-2 rounded-lg font-bold uppercase text-sm tracking-wide transition-all ${
+                            statusFilter === 'Completed'
+                                ? 'bg-black text-white dark:bg-white dark:text-black'
+                                : 'bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
+                        }`}
+                    >
+                        Completed
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('Cancelled')}
+                        className={`px-6 py-2 rounded-lg font-bold uppercase text-sm tracking-wide transition-all ${
+                            statusFilter === 'Cancelled'
+                                ? 'bg-black text-white dark:bg-white dark:text-black'
+                                : 'bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
+                        }`}
+                    >
+                        Cancelled
+                    </button>
                 </div>
             </div>
 

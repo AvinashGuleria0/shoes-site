@@ -41,10 +41,10 @@ const ProductCard = ({ product }) => {
   const totalStock = product.sizes?.reduce((acc, s) => acc + (s.quantity || 0), 0) || product.stock || 0;
 
   return (
-    <div className="group relative bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl overflow-hidden hover-lift border border-gray-100 dark:border-zinc-800">
+    <div className="group relative bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl overflow-hidden hover-lift border border-gray-100 dark:border-zinc-800 flex flex-col h-full">
       
       {/* IMAGE CONTAINER */}
-      <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden">
+      <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-800 dark:to-zinc-900 overflow-hidden flex-shrink-0">
         
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
@@ -60,7 +60,7 @@ const ProductCard = ({ product }) => {
         </Link>
         
         {/* Floating Action Buttons - Always visible on mobile */}
-        <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex flex-col gap-1.5 sm:gap-2 sm:opacity-0 sm:group-hover:opacity-100 sm:translate-x-4 sm:group-hover:translate-x-0 transition-all duration-300">
+        <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex flex-col gap-1.5 sm:gap-2 sm:opacity-0 sm:group-hover:opacity-100 sm:translate-x-4 sm:group-hover:translate-x-0 transition-all duration-300 z-10">
           <button 
             onClick={toggleWishlistHandler}
             className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg transition-all transform hover:scale-110 ${
@@ -84,7 +84,7 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Stock Badge */}
-        <div className="absolute top-2 sm:top-4 left-2 sm:left-4">
+        <div className="absolute top-2 sm:top-4 left-2 sm:left-4 z-10">
           <span className={`text-[8px] sm:text-[10px] font-black uppercase px-2 sm:px-3 py-1 sm:py-1.5 rounded-full ${
             totalStock === 0 
               ? 'bg-red-500 text-white' 
@@ -95,27 +95,10 @@ const ProductCard = ({ product }) => {
             {totalStock === 0 ? 'Sold Out' : totalStock < 5 ? `${totalStock} left` : 'In Stock'}
           </span>
         </div>
-
-        {/* Quick Add Button */}
-        <button 
-          onClick={addToCartHandler}
-          disabled={totalStock === 0}
-          className={`absolute bottom-2 sm:bottom-4 left-2 sm:left-4 right-2 sm:right-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-300 btn-ripple ${
-            totalStock === 0 
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-              : 'bg-black text-white dark:bg-white dark:text-black hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white'
-          }`}
-          title="Add to Cart"
-        >
-          <FaShoppingCart size={12} className="sm:hidden" />
-          <FaShoppingCart size={14} className="hidden sm:block" />
-          <span className="hidden sm:inline">Add to Cart</span>
-          <span className="sm:hidden">Add</span>
-        </button>
       </div>
 
       {/* DETAILS */}
-      <div className="p-3 sm:p-5">
+      <div className="p-3 sm:p-5 flex flex-col flex-grow">
         <div className="flex items-center justify-between mb-1 sm:mb-2">
           <span className="text-[8px] sm:text-[10px] font-bold text-red-500 uppercase tracking-[0.1em] sm:tracking-[0.2em]">{product.category || 'Sneakers'}</span>
           
@@ -131,9 +114,26 @@ const ProductCard = ({ product }) => {
           <h3 className="text-sm sm:text-lg font-black tracking-tight mb-1 hover:text-red-500 transition-colors line-clamp-1">{product.name}</h3>
         </Link>
         
-        <div className="flex justify-between items-center mt-2 sm:mt-3">
+        <div className="flex justify-between items-center mt-2 sm:mt-3 mb-3 sm:mb-4">
           <span className="text-base sm:text-xl font-black">₹{product.price?.toLocaleString()}</span>
         </div>
+
+        {/* Add to Cart Button - Now inline instead of absolute */}
+        <button 
+          onClick={addToCartHandler}
+          disabled={totalStock === 0}
+          className={`w-full py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-1 sm:gap-2 transition-all duration-300 btn-ripple mt-auto ${
+            totalStock === 0 
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+              : 'bg-black text-white dark:bg-white dark:text-black hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white active:scale-95'
+          }`}
+          title="Add to Cart"
+        >
+          <FaShoppingCart size={12} className="sm:hidden" />
+          <FaShoppingCart size={14} className="hidden sm:block" />
+          <span className="hidden sm:inline">Add to Cart</span>
+          <span className="sm:hidden">Add</span>
+        </button>
       </div>
     </div>
   );
