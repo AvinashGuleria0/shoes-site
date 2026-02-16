@@ -89,12 +89,12 @@ const ProductListPage = () => {
     return (
         <div className="pb-12 sm:pb-20">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 sm:mb-8 gap-4">
-                <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">Products</h2>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tight">Products</h2>
                 
                 <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
                     {/* Search */}
-                    <div className="relative flex-1 md:w-64 min-w-[150px]">
-                        <FaSearch className="absolute left-3 top-2.5 sm:top-3 text-gray-400 text-sm" />
+                    <div className="relative flex-1 md:w-64 min-w-[120px] sm:min-w-[150px]">
+                        <FaSearch className="absolute left-2 sm:left-3 top-2 sm:top-2.5 text-gray-400 text-xs sm:text-sm" />
                         <input 
                             type="text" 
                             placeholder="Search product..." 
@@ -135,15 +135,15 @@ const ProductListPage = () => {
                 </div>
             ) : (
             <div className="bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full">
+                <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-zinc-700">
+                    <table className="min-w-full w-full">
                         <thead className="bg-gray-50 dark:bg-black">
-                            <tr className="text-left text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-500">
-                                <th className="p-3 sm:p-4">Product</th>
-                                <th className="p-3 sm:p-4 hidden sm:table-cell">Stock</th>
-                                <th className="p-3 sm:p-4">Price</th>
-                                <th className="p-3 sm:p-4 hidden md:table-cell">Category</th>
-                                <th className="p-3 sm:p-4">Actions</th>
+                            <tr className="text-left text-[10px] sm:text-xs font-black uppercase tracking-wider sm:tracking-widest text-gray-500">
+                                <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Product</th>
+                                <th className="p-2 sm:p-3 md:p-4 hidden sm:table-cell whitespace-nowrap">Stock</th>
+                                <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Price</th>
+                                <th className="p-2 sm:p-3 md:p-4 hidden md:table-cell whitespace-nowrap">Category</th>
+                                <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
@@ -151,17 +151,17 @@ const ProductListPage = () => {
                                 const totalStock = product.sizes?.reduce((acc, s) => acc + (s.quantity || 0), 0) || 0;
                                 return (
                                     <tr key={product._id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors group">
-                                        <td className="p-3 sm:p-4 flex items-center gap-2 sm:gap-4">
-                                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white dark:bg-black p-1 rounded-lg border flex items-center justify-center overflow-hidden flex-shrink-0">
+                                        <td className="p-2 sm:p-3 md:p-4 flex items-center gap-2 sm:gap-4">
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-white dark:bg-black p-1 rounded-lg border flex items-center justify-center overflow-hidden flex-shrink-0">
                                                 <img 
                                                    src={product.images?.side?.startsWith('http') ? product.images.side : `${import.meta.env.VITE_API_URL}${product.images?.side}`} 
                                                    alt={product.name} 
                                                    className="max-h-full max-w-full object-contain"
                                                 />
                                             </div>
-                                            <span className="font-bold text-xs sm:text-sm tracking-tight truncate max-w-[100px] sm:max-w-none">{product.name}</span>
+                                            <span className="font-bold text-[10px] sm:text-xs md:text-sm tracking-tight truncate max-w-[80px] sm:max-w-[120px] md:max-w-none">{product.name}</span>
                                         </td>
-                                        <td className="p-3 sm:p-4 hidden sm:table-cell">
+                                        <td className="p-2 sm:p-3 md:p-4 hidden sm:table-cell">
                                             <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${
                                                 totalStock === 0 ? 'bg-red-100 text-red-600' :
                                                 totalStock < 10 ? 'bg-yellow-100 text-yellow-600' :
@@ -170,23 +170,23 @@ const ProductListPage = () => {
                                                 {totalStock === 0 ? 'Out' : `${totalStock}`}
                                             </span>
                                         </td>
-                                        <td className="p-3 sm:p-4 font-black text-xs sm:text-sm">₹{product.price}</td>
-                                        <td className="p-3 sm:p-4 hidden md:table-cell">
+                                        <td className="p-2 sm:p-3 md:p-4 font-black text-[10px] sm:text-xs md:text-sm whitespace-nowrap">₹{product.price}</td>
+                                        <td className="p-2 sm:p-3 md:p-4 hidden md:table-cell">
                                             <span className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest">{product.category}</span>
                                         </td>
-                                        <td className="p-3 sm:p-4">
+                                        <td className="p-2 sm:p-3 md:p-4">
                                             <div className="flex gap-1 sm:gap-2">
                                                 <Link 
                                                     to={`/admin/dashboard/product/${product._id}/edit`}
-                                                    className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-gray-100 dark:bg-zinc-800 rounded-lg hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
+                                                    className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 flex items-center justify-center bg-gray-100 dark:bg-zinc-800 rounded-lg hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
                                                 >
-                                                    <FaEdit size={10} />
+                                                    <FaEdit size={10} className="sm:w-3 sm:h-3" />
                                                 </Link>
                                                 <button 
                                                     onClick={() => deleteHandler(product._id)}
-                                                    className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-red-50 dark:bg-red-900/20 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"
+                                                    className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 flex items-center justify-center bg-red-50 dark:bg-red-900/20 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"
                                                 >
-                                                    <FaTrash size={10} />
+                                                    <FaTrash size={10} className="sm:w-3 sm:h-3" />
                                                 </button>
                                             </div>
                                         </td>

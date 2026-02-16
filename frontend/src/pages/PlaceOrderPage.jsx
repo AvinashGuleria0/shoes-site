@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import logo from '../assets/logo.jpeg';
 
 const PlaceOrderPage = () => {
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ const PlaceOrderPage = () => {
             {
                 orderItems: cart.cartItems.map(item => ({
                     ...item,
-                    productId: item._id, // Backend expects productId
+                    productId: item._id,
                     image: item.images?.side || item.image
                 })),
                 shippingAddress: cart.shippingAddress,
@@ -97,9 +98,9 @@ const PlaceOrderPage = () => {
             key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'placeholder', 
             amount: order.totalPrice * 100,
             currency: "INR",
-            name: "KICKS.",
+            name: "PADVYK CREATIONS PRIVATE LIMITED",
             description: `Order #${order._id}`,
-            image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=200&q=80",
+            image: logo,
             order_id: order.razorpayOrderId, 
             handler: async function (response) {
                 // 5. Verify Payment on Backend

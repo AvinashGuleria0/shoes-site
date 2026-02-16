@@ -151,6 +151,34 @@ body {
   scrollbar-width: none;
 }
 
+/* Thin scrollbar for tables */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+}
+.dark .scrollbar-thumb-zinc-700::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+}
+
 /* Text gradient */
 .text-gradient {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

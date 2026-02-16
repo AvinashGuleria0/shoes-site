@@ -24,8 +24,12 @@ const addOrderItems = async (req, res) => {
     } else {
       // 1. Create Order in DB
       const orderItemsWithIds = orderItems.map((item) => ({
-        ...item,
         productId: item.productId || item._id || item.product,
+        name: item.name,
+        qty: item.qty,
+        price: item.price,
+        image: item.image,
+        size: item.size
       }));
 
       const order = new Order({

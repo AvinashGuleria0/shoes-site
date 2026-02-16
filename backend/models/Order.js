@@ -7,7 +7,8 @@ const orderSchema = mongoose.Schema({
     name: String,
     qty: { type: Number, required: true },
     price: { type: Number, required: true },
-    image: String
+    image: String,
+    size: String
   }],
   shippingAddress: {
     address: { type: String, required: true },
