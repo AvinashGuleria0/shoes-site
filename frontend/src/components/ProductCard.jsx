@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToCart } from '../store/cartSlice';
 import { addToWishlist, removeFromWishlist } from '../store/wishlistSlice';
 import { toast } from 'react-toastify';
 import { FaShoppingCart, FaHeart, FaEye } from 'react-icons/fa';
@@ -10,13 +9,6 @@ const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const { wishlistItems } = useSelector((state) => state.wishlist) || { wishlistItems: [] };
   const isInWishlist = wishlistItems?.find(x => x._id === product._id);
-
-  const addToCartHandler = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dispatch(addToCart({ ...product, qty: 1 }));
-    toast.success(`${product.name} added to cart`);
-  };
 
   const toggleWishlistHandler = (e) => {
     e.preventDefault();
@@ -119,21 +111,20 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Add to Cart Button - Now inline instead of absolute */}
-        <button 
-          onClick={addToCartHandler}
-          disabled={totalStock === 0}
+        <Link 
+          to={`/product/${product._id}`}
           className={`w-full py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-1 sm:gap-2 transition-all duration-300 btn-ripple mt-auto ${
             totalStock === 0 
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed pointer-events-none' 
               : 'bg-black text-white dark:bg-white dark:text-black hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white active:scale-95'
           }`}
-          title="Add to Cart"
+          title="Select size"
         >
           <FaShoppingCart size={12} className="sm:hidden" />
           <FaShoppingCart size={14} className="hidden sm:block" />
-          <span className="hidden sm:inline">Add to Cart</span>
-          <span className="sm:hidden">Add</span>
-        </button>
+          <span className="hidden sm:inline">Select Size</span>
+          <span className="sm:hidden">Select</span>
+        </Link>
       </div>
     </div>
   );

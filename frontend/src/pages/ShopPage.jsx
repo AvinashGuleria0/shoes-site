@@ -2,15 +2,12 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
-import { FaFilter, FaTh, FaList, FaSearch } from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 
 const ShopPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
-  const [viewMode, setViewMode] = useState('grid');
-  const [showFilters, setShowFilters] = useState(false);
   
   const [searchParams] = useSearchParams();
   const keyword = searchParams.get('keyword') || '';
@@ -20,10 +17,6 @@ const ShopPage = () => {
       setLoading(true);
       try {
         let query = `${import.meta.env.VITE_API_URL}/api/products?keyword=${keyword}`;
-        if (category !== 'All') {
-          query += `&category=${category}`;
-        }
-
         const { data } = await axios.get(query);
         
         // Sort products
@@ -44,9 +37,7 @@ const ShopPage = () => {
       }
     };
     fetchProducts();
-  }, [keyword, category, sortBy]);
-
-  const categories = ['All', 'Lifestyle', 'Basketball', 'Running', 'Sample Category'];
+  }, [keyword, sortBy]);
 
   return (
     <div className="pt-16 sm:pt-20 min-h-screen bg-gray-50 dark:bg-deep-void transition-colors duration-300">
@@ -69,68 +60,19 @@ const ShopPage = () => {
 
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-10">
         
-        {/* Mobile Filter Toggle */}
-        <button 
-          onClick={() => setShowFilters(!showFilters)}
-          className="lg:hidden w-full mb-4 py-3 px-4 bg-white dark:bg-zinc-900 rounded-xl shadow-sm flex items-center justify-between font-bold"
-        >
-          <span className="flex items-center gap-2"><FaFilter /> Filters & Sort</span>
-          <span className="text-xs text-gray-500">{category !== 'All' ? category : 'All Categories'}</span>
-        </button>
-
-        {/* Filters Bar */}
-        <div className={`${showFilters ? 'block' : 'hidden'} lg:block mb-6 sm:mb-10`}>
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6 p-4 sm:p-6 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm">
-            
-            {/* Categories */}
-            <div className="flex flex-wrap gap-2 w-full lg:w-auto">
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => { setCategory(cat); setShowFilters(false); }}
-                  className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-full font-bold text-xs sm:text-sm uppercase tracking-wider transition-all ${
-                    category === cat 
-                    ? 'bg-black text-white dark:bg-white dark:text-black shadow-lg' 
-                    : 'bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-
-            {/* Sort & View Options */}
-            <div className="flex items-center gap-3 sm:gap-4 w-full lg:w-auto">
-              <div className="flex items-center gap-2 flex-1 lg:flex-none">
-                <FaFilter className="text-gray-400 hidden sm:block" />
-                <select 
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="flex-1 lg:flex-none bg-gray-100 dark:bg-zinc-800 px-3 sm:px-4 py-2 rounded-lg font-bold text-xs sm:text-sm focus:outline-none focus:ring-2 ring-black dark:ring-white cursor-pointer"
-                >
-                  <option value="newest">Newest</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                  <option value="name">Name: A-Z</option>
-                </select>
-              </div>
-
-              {/* View Toggle */}
-              <div className="hidden md:flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 p-1 rounded-lg">
-                <button 
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-gray-500 hover:text-black dark:hover:text-white'}`}
-                >
-                  <FaTh />
-                </button>
-                <button 
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-black text-white dark:bg-white dark:text-black' : 'text-gray-500 hover:text-black dark:hover:text-white'}`}
-                >
-                  <FaList />
-                </button>
-              </div>
-            </div>
+        {/* Sort Options */}
+        <div className="mb-6 sm:mb-10">
+          <div className="flex justify-end items-center p-4 sm:p-6 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm">
+            <select 
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-gray-100 dark:bg-zinc-800 px-3 sm:px-4 py-2 rounded-lg font-bold text-xs sm:text-sm focus:outline-none focus:ring-2 ring-black dark:ring-white cursor-pointer"
+            >
+              <option value="newest">Newest</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="name">Name: A-Z</option>
+            </select>
           </div>
         </div>
 
@@ -149,19 +91,10 @@ const ShopPage = () => {
             <p className="text-gray-500 mb-6 text-sm sm:text-base">
               {keyword ? `No results for "${keyword}". Try a different search term.` : 'No products in this category.'}
             </p>
-            <button 
-              onClick={() => { setCategory('All'); }}
-              className="px-6 py-3 bg-black text-white dark:bg-white dark:text-black rounded-full font-bold uppercase tracking-wider text-sm hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-all"
-            >
-              View All Products
-            </button>
+
           </div>
         ) : (
-          <div className={
-            viewMode === 'grid' 
-              ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6"
-              : "flex flex-col gap-4"
-          }>
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {products.map((product, idx) => (
               <div 
                 key={product._id} 

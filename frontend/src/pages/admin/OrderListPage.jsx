@@ -10,6 +10,7 @@ const OrderListPage = () => {
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
+    const [sortBy, setSortBy] = useState('newest');
 
     const { userInfo } = useSelector(state => state.auth);
     const navigate = useNavigate();
@@ -30,7 +31,7 @@ const OrderListPage = () => {
     }, [userInfo]);
 
     useEffect(() => {
-        let tempOrders = orders;
+        let tempOrders = [...orders];
 
         // 1. Search Filter (ID or User Name)
         if (searchTerm) {
@@ -49,8 +50,32 @@ const OrderListPage = () => {
             }
         }
 
+        // 3. Sorting
+        switch(sortBy) {
+            case 'newest':
+                tempOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                break;
+            case 'oldest':
+                tempOrders.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                break;
+            case 'highest-price':
+                tempOrders.sort((a, b) => b.totalPrice - a.totalPrice);
+                break;
+            case 'lowest-price':
+                tempOrders.sort((a, b) => a.totalPrice - b.totalPrice);
+                break;
+            case 'paid-first':
+                tempOrders.sort((a, b) => b.isPaid - a.isPaid);
+                break;
+            case 'pending-first':
+                tempOrders.sort((a, b) => a.isPaid - b.isPaid);
+                break;
+            default:
+                break;
+        }
+
         setFilteredOrders(tempOrders);
-    }, [searchTerm, statusFilter, orders]);
+    }, [searchTerm, statusFilter, orders, sortBy]);
 
     return (
         <div className="pb-20">
@@ -58,16 +83,32 @@ const OrderListPage = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 className="text-3xl font-black uppercase tracking-tight">Order Management</h2>
                     
-                    {/* Search */}
-                    <div className="relative flex-1 sm:flex-none sm:w-64">
-                        <FaSearch className="absolute left-3 top-3 text-gray-400" />
-                        <input 
-                            type="text" 
-                            placeholder="Search Order ID or User..." 
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 border-none focus:ring-2 ring-black dark:ring-white outline-none"
-                        />
+                    <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                        {/* Sort Dropdown */}
+                        <select 
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 border-none focus:ring-2 ring-black dark:ring-white outline-none font-bold text-sm uppercase tracking-wide"
+                        >
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="highest-price">Highest Price</option>
+                            <option value="lowest-price">Lowest Price</option>
+                            <option value="paid-first">Paid First</option>
+                            <option value="pending-first">Pending First</option>
+                        </select>
+
+                        {/* Search */}
+                        <div className="relative flex-1 sm:flex-none sm:w-64">
+                            <FaSearch className="absolute left-3 top-3 text-gray-400" />
+                            <input 
+                                type="text" 
+                                placeholder="Search Order ID or User..." 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 border-none focus:ring-2 ring-black dark:ring-white outline-none"
+                            />
+                        </div>
                     </div>
                 </div>
                 
@@ -131,18 +172,18 @@ const OrderListPage = () => {
                     <p className="font-bold text-gray-500">No orders found matching your criteria.</p>
                 </div>
             ) : (
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full">
+            <div className="bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 overflow-hidden">
+                <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-zinc-700">
+                    <table className="min-w-full w-full">
                         <thead className="bg-gray-50 dark:bg-black">
-                            <tr className="text-left text-xs font-black uppercase tracking-widest text-gray-500">
-                                <th className="p-4">Order ID</th>
-                                <th className="p-4">Customer</th>
-                                <th className="p-4">Date</th>
-                                <th className="p-4">Total</th>
-                                <th className="p-4">Payment</th>
-                                <th className="p-4">Fulfillment</th>
-                                <th className="p-4">Action</th>
+                            <tr className="text-left text-[10px] sm:text-xs font-black uppercase tracking-wider sm:tracking-widest text-gray-500">
+                                <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Order ID</th>
+                                <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Customer</th>
+                                <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Date</th>
+                                <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Total</th>
+                                <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Payment</th>
+                                <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Fulfillment</th>
+                                <th className="p-2 sm:p-3 md:p-4 whitespace-nowrap">Action</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
@@ -151,14 +192,14 @@ const OrderListPage = () => {
                                     key={order._id} 
                                     className="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors group"
                                 >
-                                    <td className="p-4 font-mono text-xs text-gray-500 group-hover:text-black dark:group-hover:text-white transition-colors">#{order._id.substring(order._id.length - 6)}</td>
-                                    <td className="p-4">
-                                        <div className="font-bold text-sm">{order.userId?.name || 'Deleted User'}</div>
-                                        <div className="text-xs text-gray-400">{order.userId?.email}</div>
+                                    <td className="p-2 sm:p-3 md:p-4 font-mono text-[10px] sm:text-xs text-gray-500 group-hover:text-black dark:group-hover:text-white transition-colors whitespace-nowrap">#{order._id.substring(order._id.length - 6)}</td>
+                                    <td className="p-2 sm:p-3 md:p-4">
+                                        <div className="font-bold text-xs sm:text-sm">{order.userId?.name || 'Deleted User'}</div>
+                                        <div className="text-[10px] sm:text-xs text-gray-400 hidden sm:block">{order.userId?.email}</div>
                                     </td>
-                                    <td className="p-4 text-xs font-bold text-gray-500">{order.createdAt.substring(0, 10)}</td>
-                                    <td className="p-4 font-black">₹{order.totalPrice}</td>
-                                    <td className="p-4">
+                                    <td className="p-2 sm:p-3 md:p-4 text-[10px] sm:text-xs font-bold text-gray-500 whitespace-nowrap">{order.createdAt.substring(0, 10)}</td>
+                                    <td className="p-2 sm:p-3 md:p-4 font-black text-xs sm:text-sm whitespace-nowrap">₹{order.totalPrice}</td>
+                                    <td className="p-2 sm:p-3 md:p-4">
                                         {order.isPaid ? (
                                             <span className="bg-green-100 text-green-700 text-[10px] font-black uppercase px-2 py-1 rounded-md">
                                                 Paid
@@ -178,10 +219,10 @@ const OrderListPage = () => {
                                             {order.status}
                                         </span>
                                     </td>
-                                    <td className="p-4">
+                                    <td className="p-2 sm:p-3 md:p-4">
                                         <button 
                                             onClick={() => navigate(`/admin/dashboard/order/${order._id}`)}
-                                            className="text-xs font-bold bg-black text-white px-3 py-1.5 rounded-lg hover:bg-gray-800 transition-colors"
+                                            className="text-[10px] sm:text-xs font-bold bg-black text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg hover:bg-gray-800 transition-colors whitespace-nowrap"
                                         >
                                             View
                                         </button>

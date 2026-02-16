@@ -9,7 +9,9 @@ import { logout } from '../store/authSlice';
 const ProfilePage = () => {
     const { userInfo } = useSelector((state) => state.auth);
     const [orders, setOrders] = useState([]);
+    const [sortedOrders, setSortedOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [sortBy, setSortBy] = useState('newest');
     
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -33,6 +35,28 @@ const ProfilePage = () => {
             fetchMyOrders();
         }
     }, [userInfo, navigate]);
+
+    // Sort orders based on selected sort option
+    useEffect(() => {
+        let sorted = [...orders];
+        switch(sortBy) {
+            case 'newest':
+                sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                break;
+            case 'oldest':
+                sorted.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                break;
+            case 'highest-price':
+                sorted.sort((a, b) => b.totalPrice - a.totalPrice);
+                break;
+            case 'lowest-price':
+                sorted.sort((a, b) => a.totalPrice - b.totalPrice);
+                break;
+            default:
+                break;
+        }
+        setSortedOrders(sorted);
+    }, [orders, sortBy]);
 
     const logoutHandler = () => {
         dispatch(logout());
@@ -78,9 +102,24 @@ const ProfilePage = () => {
 
                     {/* RIGHT: ORDERS */}
                     <div className="md:w-2/3">
-                        <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-6 sm:mb-8 flex flex-wrap items-center gap-2 sm:gap-3">
-                            <FaBoxOpen className="text-red-600" /> Order History <span className="text-gray-400 text-base sm:text-xl">({orders.length})</span>
-                        </h2>
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+                            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight flex flex-wrap items-center gap-2 sm:gap-3">
+                                <FaBoxOpen className="text-red-600" /> Order History <span className="text-gray-400 text-base sm:text-xl">({orders.length})</span>
+                            </h2>
+                            
+                            {orders.length > 0 && (
+                                <select 
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="px-3 sm:px-4 py-2 rounded-lg bg-gray-100 dark:bg-zinc-800 border-none focus:ring-2 ring-black dark:ring-white outline-none font-bold text-xs sm:text-sm uppercase tracking-wide"
+                                >
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="highest-price">Highest Price</option>
+                                    <option value="lowest-price">Lowest Price</option>
+                                </select>
+                            )}
+                        </div>
 
                         {loading ? (
                             <p className="font-bold animate-pulse">Loading orders...</p>
@@ -93,7 +132,7 @@ const ProfilePage = () => {
                             </div>
                         ) : (
                             <div className="space-y-4 sm:space-y-6">
-                                {orders.map(order => (
+                                {sortedOrders.map(order => (
                                     <div key={order._id} className="bg-gray-50 dark:bg-zinc-900 p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-transparent hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
                                         <div className="flex justify-between items-start mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-gray-200 dark:border-zinc-800">
                                             <div>

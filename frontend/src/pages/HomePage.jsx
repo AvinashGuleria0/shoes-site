@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 import { FaArrowRight, FaShippingFast, FaUndo, FaHeadset, FaStar } from 'react-icons/fa';
+import logo from '../assets/logo.jpeg';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -144,7 +145,7 @@ const HomePage = () => {
         
         {/* Background Text */}
         <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[30vw] sm:text-[25vw] lg:text-[20vw] font-black text-gray-200/30 dark:text-white/5 whitespace-nowrap select-none pointer-events-none">
-          {featuredProduct?.name?.split(' ')[0]?.toUpperCase() || 'KICKS'}
+          {featuredProduct?.name?.split(' ')[0]?.toUpperCase() || 'PADVYK'}
         </h1>
 
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 min-h-[calc(100vh-80px)] flex flex-col lg:flex-row items-center justify-center gap-6 sm:gap-8 relative z-10">
@@ -379,31 +380,16 @@ const HomePage = () => {
         </section>
       )}
 
-      {/* ========== CTA BANNER ========== */}
-      <section className="py-12 sm:py-20 px-4 sm:px-6 bg-gradient-to-r from-red-600 to-orange-500 text-white">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-black uppercase tracking-tighter mb-4 sm:mb-6">
-            Ready to Step Up?
-          </h2>
-          <p className="text-base sm:text-xl opacity-90 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
-            Join thousands of sneakerheads who trust KICKS for authentic, premium footwear.
-          </p>
-          <Link 
-            to="/shop"
-            className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-5 bg-white text-black rounded-full font-black uppercase tracking-wider text-sm sm:text-base hover:bg-black hover:text-white transition-all transform hover:scale-105 shadow-2xl"
-          >
-            Shop Collection <FaArrowRight />
-          </Link>
-        </div>
-      </section>
-
       {/* ========== FOOTER ========== */}
       <footer className="py-10 sm:py-12 px-4 sm:px-6 bg-black text-white">
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6 sm:gap-8">
             <div className="text-center md:text-left">
-              <h3 className="text-2xl sm:text-3xl font-black tracking-tighter">KICKS<span className="text-red-500">.</span></h3>
-              <p className="text-gray-400 mt-2 text-sm sm:text-base">Premium sneakers, delivered.</p>
+              <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                <img src={logo} alt="PADVYK CREATIONS" className="h-10 w-auto object-contain" />
+                <h3 className="text-lg sm:text-xl font-bold tracking-tight">PADVYK CREATIONS</h3>
+              </div>
+              <p className="text-gray-400 text-sm sm:text-base">Premium sneakers, delivered.</p>
             </div>
             <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-xs sm:text-sm font-bold uppercase tracking-wider">
               <Link to="/shop" className="hover:text-red-500 transition-colors">Shop</Link>
@@ -413,7 +399,7 @@ const HomePage = () => {
             </div>
           </div>
           <div className="border-t border-zinc-800 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-gray-500 text-xs sm:text-sm">
-            © 2026 KICKS. All rights reserved. Made with ❤️
+            © 2026 PADVYK CREATIONS PRIVATE LIMITED. All rights reserved. Made with ❤️
           </div>
         </div>
       </footer>

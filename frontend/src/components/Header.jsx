@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store/authSlice';
 import { FaShoppingCart, FaUser, FaSignOutAlt, FaSun, FaMoon, FaSearch, FaHeart, FaBars, FaTimes } from 'react-icons/fa';
+import logo from '../assets/logo.jpeg';
 
 const Header = () => {
   const { cartItems } = useSelector((state) => state.cart);
@@ -61,8 +62,9 @@ const Header = () => {
     <header className="fixed w-full z-50 transition-all duration-300 bg-white/70 backdrop-blur-xl border-b border-gray-200/50 text-gray-800 dark:text-white dark:bg-black/70 dark:border-white/10 shadow-sm">
       <nav className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
         {/* LOGO */}
-        <Link to="/" className="text-xl sm:text-2xl font-black tracking-tighter uppercase relative z-10">
-          KICKS<span className="text-red-500">.</span>
+        <Link to="/" className="flex items-center gap-2 relative z-10" title="PADVYK CREATIONS PRIVATE LIMITED">
+          <img src={logo} alt="PADVYK CREATIONS" className="h-10 sm:h-12 w-auto object-contain" />
+          <span className="hidden md:block text-sm lg:text-base font-bold tracking-tight">PADVYK CREATIONS</span>
         </Link>
 
         {/* NAVIGATION LINKS - Hidden on mobile */}
@@ -128,18 +130,19 @@ const Header = () => {
           </Link>
 
           {userInfo ? (
-            <div className="hidden sm:flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* Profile Button - Visible on all sizes */}
+              <Link to="/profile" className="hover:text-red-500 transition-colors flex items-center gap-1 sm:gap-2">
+                <FaUser className="text-lg sm:text-xl" />
+                <span className="hidden sm:inline text-xs uppercase font-bold text-gray-500">{userInfo.name.split(' ')[0]}</span>
+              </Link>
+
               {/* ADMIN LINK */}
               {(userInfo.role === 'admin' || userInfo.role === 'superadmin') && (
                 <Link to="/admin/dashboard" className="text-[10px] font-black bg-red-600 text-white px-2 py-1 rounded tracking-tighter hover:bg-red-700 transition-all hidden lg:block">
                   ADMIN
                 </Link>
               )}
-              {/* Profile Link */}
-              <Link to="/profile" className="hidden lg:flex flex-col items-end hover:text-red-500 transition-colors">
-                <span className="text-[10px] uppercase text-gray-500 font-bold leading-none">Welcome</span>
-                <span className="text-xs font-black">{userInfo.name.split(' ')[0]}</span>
-              </Link>
               <button 
                 onClick={handleLogout}
                 className="text-gray-500 hover:text-red-500 transition-colors"
@@ -149,7 +152,7 @@ const Header = () => {
               </button>
             </div>
           ) : (
-            <Link to="/login" className="hidden sm:flex items-center gap-2 hover:text-red-500 transition-colors">
+            <Link to="/login" className="flex items-center gap-2 hover:text-red-500 transition-colors">
               <FaUser className="text-xl" />
             </Link>
           )}
