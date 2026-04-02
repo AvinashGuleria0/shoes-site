@@ -4,6 +4,11 @@ A full-stack e-commerce web application specializing in footwear. Built with the
 
 **Live Demo:** [https://shoes-site-padvyk.vercel.app/](https://shoes-site-padvyk.vercel.app/)
 
+
+https://github.com/user-attachments/assets/e76f89db-82f1-4ee3-95bf-7f1c7ff7bb26
+
+
+
 ## Features
 
 *   **User Authentication:** Secure login and registration using JWT and Google OAuth (Passport.js).
