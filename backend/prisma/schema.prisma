@@ -1,0 +1,152 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("NEON_DB")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
+}
+
+enum OrderStatus {
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum OtpType {
+  VERIFY_EMAIL
+  FORGOT_PASSWORD
+}
+
+model User {
+  id        String     @id @default(uuid())
+  name      String
+  email     String     @unique
+  phone     String?    @unique
+  password  String
+  googleId  String?    @unique
+  role      Role       @default(USER)
+  isActive  Boolean    @default(true)
+  addresses Address[]
+  orders    Order[]
+  adminLogs AdminLog[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Address {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  street     String
+  city       String
+  postalCode String
+  country    String
+  createdAt  DateTime @default(now())
+}
+
+model Product {
+  id          String         @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  category    String
+  isFeatured  Boolean        @default(false)
+  sizes       ProductSize[]
+  images      ProductImage?
+  orderItems  OrderItem[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model ProductImage {
+  id          String   @id @default(uuid())
+  productId   String   @unique
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  front       String
+  side        String
+  back        String
+  perspective String?
+  createdAt   DateTime @default(now())
+}
+
+model ProductSize {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size      String
+  quantity  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, size])
+}
+
+model Order {
+  id                String          @id @default(uuid())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  totalPrice        Float
+  isPaid            Boolean         @default(false)
+  paidAt            DateTime?
+  isDelivered       Boolean         @default(false)
+  deliveredAt       DateTime?
+  status            OrderStatus     @default(PROCESSING)
+  paymentMethod     String
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  razorpaySignature String?
+  cancellationNote  String?
+  shippingAddress   ShippingAddress?
+  orderItems        OrderItem[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+model ShippingAddress {
+  id         String @id @default(uuid())
+  orderId    String @unique
+  order      Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  address    String
+  city       String
+  postalCode String
+  country    String
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  qty       Int
+  price     Float
+  size      String
+  createdAt DateTime @default(now())
+}
+
+model AdminLog {
+  id             String   @id @default(uuid())
+  adminId        String
+  admin          User     @relation(fields: [adminId], references: [id])
+  actionType     String
+  targetDocument String
+  details        String
+  timestamp      DateTime @default(now())
+}
+
+model Otp {
+  id        String   @id @default(uuid())
+  email     String
+  otp       String
+  type      OtpType
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

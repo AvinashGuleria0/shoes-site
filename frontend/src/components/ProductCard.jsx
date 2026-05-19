@@ -44,11 +44,19 @@ const ProductCard = ({ product }) => {
         </div>
         
         <Link to={`/product/${product._id}`} className="block w-full h-full">
-          <img 
-            src={getImageUrl(product.images?.side || product.image)} 
-            alt={product.name}
-            className="w-full h-full object-contain p-3 sm:p-6 group-hover:scale-110 group-hover:rotate-[-5deg] transition-all duration-500 drop-shadow-xl" 
-          />
+          {(() => {
+            const imageUrl = getImageUrl(product.images?.side || product.image);
+            const isTransparent = imageUrl.includes('.png') || imageUrl.includes('res.cloudinary.com') || imageUrl.includes('nobg');
+            return (
+              <img 
+                src={imageUrl} 
+                alt={product.name}
+                className={`w-full h-full object-contain p-3 sm:p-6 transition-all duration-500 drop-shadow-xl ${
+                  isTransparent ? 'group-hover:scale-110 group-hover:rotate-[-5deg]' : 'group-hover:scale-105'
+                }`} 
+              />
+            );
+          })()}
         </Link>
         
         {/* Floating Action Buttons - Always visible on mobile */}

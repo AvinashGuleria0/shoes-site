@@ -26,21 +26,28 @@ const HomePage = () => {
   const [products, setProducts] = useState([]);
   const [selectedHeroSize, setSelectedHeroSize] = useState('');
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
-        setProducts(data);
-        const featured = data.find(p => p.isFeatured) || data[0];
-        if (featured && featured.sizes && featured.sizes.length > 0) {
-          setSelectedHeroSize(featured.sizes[0].size);
-        }
-      } catch {
-        console.error("Failed to fetch products");
+ useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
+      
+      // Handle different API response structures safely
+      const productsArray = Array.isArray(data) ? data : (data?.products || []);
+      
+      setProducts(productsArray);
+
+      const featured = productsArray.find(p => p.isFeatured) || productsArray[0];
+      if (featured && featured.sizes && featured.sizes.length > 0) {
+        setSelectedHeroSize(featured.sizes[0].size);
       }
-    };
-    fetchProducts();
-  }, []);
+    } catch (error) {
+      console.error("Failed to fetch products", error);
+      // Keep it as an empty array on failure so .find() doesn't break later
+      setProducts([]); 
+    }
+  };
+  fetchProducts();
+}, []);
 
   const featuredProduct = products.find(p => p.isFeatured) || products[0];
 
@@ -145,7 +152,7 @@ const HomePage = () => {
         
         {/* Background Text */}
         <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[30vw] sm:text-[25vw] lg:text-[20vw] font-black text-gray-200/30 dark:text-white/5 whitespace-nowrap select-none pointer-events-none">
-          {featuredProduct?.name?.split(' ')[0]?.toUpperCase() || 'PADVYK'}
+          {featuredProduct?.name?.split(' ')[0]?.toUpperCase() || 'KICKS'}
         </h1>
 
         <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 min-h-[calc(100vh-80px)] flex flex-col lg:flex-row items-center justify-center gap-6 sm:gap-8 relative z-10">
@@ -227,7 +234,7 @@ const HomePage = () => {
       </section>
 
       {/* ========== FEATURES STRIP ========== */}
-      <section className="py-6 sm:py-8 bg-black dark:bg-zinc-900 text-white">
+      <section className="py-6 sm:py-8 bg-white dark:bg-zinc-900 text-black dark:text-white border-y border-gray-200 dark:border-zinc-800">
         <div ref={featuresRef} className="container mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 md:gap-16">
           {[
             { icon: <FaShippingFast size={20} />, text: 'Free Shipping', sub: 'On orders over ₹2000' },
@@ -239,7 +246,7 @@ const HomePage = () => {
               <div className="text-red-500">{feature.icon}</div>
               <div>
                 <span className="font-bold block text-sm sm:text-base">{feature.text}</span>
-                <span className="text-[10px] sm:text-xs text-gray-400 hidden sm:block">{feature.sub}</span>
+                <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 hidden sm:block">{feature.sub}</span>
               </div>
             </div>
           ))}
@@ -279,127 +286,54 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ========== COMPARE SECTION ========== */}
-      {compareProducts.length >= 2 && (
-        <section ref={compareRef} className="py-12 sm:py-20 px-4 sm:px-6 bg-gray-100 dark:bg-zinc-900">
-          <div className="container mx-auto">
-            <div className="text-center mb-8 sm:mb-12">
-              <span className="text-red-500 font-bold uppercase tracking-widest text-xs sm:text-sm">Compare</span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter">Compare Models</h2>
-            </div>
-
-            <div className="flex flex-col lg:flex-row justify-center items-stretch gap-6 sm:gap-8 relative">
-              {/* Product 1 */}
-              <div className="flex-1 max-w-md mx-auto w-full bg-white dark:bg-zinc-800 p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl hover-lift">
-                <div className="h-32 sm:h-48 flex items-center justify-center mb-4 sm:mb-6">
+      {/* ========== SPOTLIGHT SECTION ========== */}
+      <section className="py-12 sm:py-20 px-4 sm:px-6 bg-white dark:bg-zinc-950">
+        <div className="container mx-auto text-center">
+          <h2 className="text-4xl sm:text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4">SPOTLIGHT</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto text-sm sm:text-base">
+            Classic silhouettes and cutting-edge innovation to build your game from the ground up.
+          </p>
+          
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-6 sm:gap-8 justify-center items-end">
+            {products.slice(0, 16).map((product) => (
+              <Link to={`/product/${product._id}`} key={product._id} className="flex flex-col items-center group cursor-pointer">
+                <div className="h-16 sm:h-20 w-full flex items-center justify-center mb-3">
                   <img 
-                    src={getImageUrl(compareProducts[0]?.images?.side)} 
-                    alt={compareProducts[0]?.name}
-                    className="max-h-full object-contain drop-shadow-lg hover:scale-110 hover:rotate-[-10deg] transition-transform duration-500"
+                    src={getImageUrl(product?.images?.side)} 
+                    alt={product.name}
+                    className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
-                <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6">{compareProducts[0]?.name}</h3>
-                
-                {/* Stats */}
-                {[
-                  { label: 'Cushioning', value: '70%' },
-                  { label: 'Durability', value: '85%' },
-                  { label: 'Weight', value: '90%', text: 'Light' },
-                ].map((stat, idx) => (
-                  <div key={idx} className="mb-4">
-                    <div className="flex justify-between text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                      <span>{stat.label}</span>
-                      <span>{stat.text || stat.value}</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-black dark:bg-white rounded-full stat-bar-fill" 
-                        data-width={stat.value}
-                        style={{ width: 0 }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-                
-                <Link 
-                  to={`/product/${compareProducts[0]?._id}`}
-                  className="block w-full text-center py-3 mt-6 bg-black text-white dark:bg-white dark:text-black rounded-xl font-bold uppercase tracking-wider hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-all"
-                >
-                  View Details
-                </Link>
-              </div>
-
-              {/* VS Badge */}
-              <div className="hidden lg:flex items-center justify-center">
-                <div className="w-16 h-16 rounded-full bg-white dark:bg-zinc-800 shadow-xl flex items-center justify-center font-black text-xl border-4 border-gray-100 dark:border-zinc-700">
-                  VS
-                </div>
-              </div>
-
-              {/* Product 2 */}
-              <div className="flex-1 max-w-md mx-auto w-full bg-white dark:bg-zinc-800 p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl hover-lift">
-                <div className="h-32 sm:h-48 flex items-center justify-center mb-4 sm:mb-6">
-                  <img 
-                    src={getImageUrl(compareProducts[1]?.images?.side)} 
-                    alt={compareProducts[1]?.name}
-                    className="max-h-full object-contain drop-shadow-lg hover:scale-110 hover:rotate-[10deg] transition-transform duration-500"
-                  />
-                </div>
-                <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6">{compareProducts[1]?.name}</h3>
-                
-                {/* Stats */}
-                {[
-                  { label: 'Cushioning', value: '95%' },
-                  { label: 'Durability', value: '75%' },
-                  { label: 'Weight', value: '60%', text: 'Medium' },
-                ].map((stat, idx) => (
-                  <div key={idx} className="mb-4">
-                    <div className="flex justify-between text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                      <span>{stat.label}</span>
-                      <span>{stat.text || stat.value}</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-red-500 rounded-full stat-bar-fill" 
-                        data-width={stat.value}
-                        style={{ width: 0 }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-                
-                <Link 
-                  to={`/product/${compareProducts[1]?._id}`}
-                  className="block w-full text-center py-3 mt-6 bg-black text-white dark:bg-white dark:text-black rounded-xl font-bold uppercase tracking-wider hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-all"
-                >
-                  View Details
-                </Link>
-              </div>
-            </div>
+                <span className="text-[10px] sm:text-xs font-bold text-center group-hover:text-red-500 transition-colors">
+                  {product.name.split(' ').slice(0, 3).join(' ')}
+                </span>
+              </Link>
+            ))}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* ========== FOOTER ========== */}
-      <footer className="py-10 sm:py-12 px-4 sm:px-6 bg-black text-white">
+      <footer className="py-10 sm:py-12 px-4 sm:px-6 bg-gray-50 dark:bg-black text-black dark:text-white border-t border-gray-200 dark:border-white/10">
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6 sm:gap-8">
             <div className="text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-                <img src={logo} alt="PADVYK CREATIONS" className="h-10 w-auto object-contain" />
-                <h3 className="text-lg sm:text-xl font-bold tracking-tight">PADVYK CREATIONS</h3>
+                <img src={logo} alt="Kicks Store" className="h-10 w-auto object-contain dark:invert" />
+                <h3 className="text-lg sm:text-xl font-bold tracking-tight">KICKS</h3>
               </div>
-              <p className="text-gray-400 text-sm sm:text-base">Premium sneakers, delivered.</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">Premium sneakers, delivered.</p>
             </div>
             <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-xs sm:text-sm font-bold uppercase tracking-wider">
               <Link to="/shop" className="hover:text-red-500 transition-colors">Shop</Link>
               <Link to="/cart" className="hover:text-red-500 transition-colors">Cart</Link>
               <Link to="/wishlist" className="hover:text-red-500 transition-colors">Wishlist</Link>
               <Link to="/profile" className="hover:text-red-500 transition-colors">Account</Link>
+              <a href="mailto:support@kicks.com" className="hover:text-red-500 transition-colors">Contact</a>
             </div>
           </div>
-          <div className="border-t border-zinc-800 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-gray-500 text-xs sm:text-sm">
-            © 2026 PADVYK CREATIONS PRIVATE LIMITED. All rights reserved. Made with ❤️
+          <div className="border-t border-gray-200 dark:border-zinc-800 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-gray-500 text-xs sm:text-sm">
+            © 2026 KICKS. All rights reserved. Made with ❤️
           </div>
         </div>
       </footer>
