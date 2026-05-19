@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const prisma = require('../config/prisma');
 
 const protect = async (req, res, next) => {
   let token;
@@ -13,8 +13,23 @@ const protect = async (req, res, next) => {
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      req.user = await User.findById(decoded.userId).select('-password');
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phone: true,
+          role: true,
+          isActive: true,
+        }
+      });
 
+      if (!user) {
+        return res.status(401).json({ message: 'Not authorized, user not found' });
+      }
+
+      req.user = user;
       next();
     } catch (error) {
       console.error(error);
@@ -28,7 +43,7 @@ const protect = async (req, res, next) => {
 };
 
 const admin = (req, res, next) => {
-  if (req.user && (req.user.role === 'admin' || req.user.role === 'superadmin')) {
+  if (req.user && (req.user.role === 'ADMIN' || req.user.role === 'SUPERADMIN')) {
     next();
   } else {
     res.status(401).json({ message: 'Not authorized as an admin' });
@@ -36,7 +51,7 @@ const admin = (req, res, next) => {
 };
 
 const superAdmin = (req, res, next) => {
-  if (req.user && req.user.role === 'superadmin') {
+  if (req.user && req.user.role === 'SUPERADMIN') {
     next();
   } else {
     res.status(401).json({ message: 'Not authorized as a super admin. Access denied.' });

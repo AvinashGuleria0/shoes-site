@@ -1,26 +1,34 @@
-const Product = require('../models/Product');
-const AdminLog = require('../models/AdminLog');
+const prisma = require('../config/prisma');
+const redis = require('../config/redis');
 
 // @desc    Fetch all products
 // @route   GET /api/products
-// @access  Public
 const getProducts = async (req, res) => {
   try {
-    const keyword = req.query.keyword
-      ? {
-          name: {
-            $regex: req.query.keyword,
-            $options: 'i',
-          },
-        }
-      : {};
+    const keyword = req.query.keyword || '';
+    const categoryQuery = req.query.category && req.query.category !== 'All' ? req.query.category : undefined;
 
-    const categoryQuery = req.query.category && req.query.category !== 'All'
-      ? { category: req.query.category }
-      : {};
+    if (redis) {
+       const cacheKey = `products:all:${keyword}:${categoryQuery || 'All'}`;
+       const cachedData = await redis.get(cacheKey);
+       if (cachedData) return res.json(cachedData);
+    }
 
-    const products = await Product.find({ ...keyword, ...categoryQuery });
-    res.json(products);
+    const products = await prisma.product.findMany({
+      where: {
+        name: { contains: keyword, mode: 'insensitive' },
+        ...(categoryQuery && { category: categoryQuery })
+      },
+      include: { sizes: true, images: true }
+    });
+
+    const formatted = products.map(p => ({
+      ...p,
+      _id: p.id,
+      images: p.images || {}
+    }));
+    if (redis) await redis.set(`products:all:${keyword}:${categoryQuery || 'All'}`, formatted, { ex: 3600 });
+    res.json(formatted);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -28,12 +36,21 @@ const getProducts = async (req, res) => {
 
 // @desc    Fetch single product
 // @route   GET /api/products/:id
-// @access  Public
 const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    if (redis) {
+       const cachedProduct = await redis.get(`product:${req.params.id}`);
+       if (cachedProduct) return res.json(cachedProduct);
+    }
+
+    const product = await prisma.product.findUnique({
+      where: { id: req.params.id },
+      include: { sizes: true, images: true }
+    });
     if (product) {
-      res.json(product);
+      const formatted = { ...product, _id: product.id, images: product.images || {} };
+      if (redis) await redis.set(`product:${req.params.id}`, formatted, { ex: 3600 });
+      res.json(formatted);
     } else {
       res.status(404).json({ message: 'Product not found' });
     }
@@ -44,32 +61,47 @@ const getProductById = async (req, res) => {
 
 // @desc    Create a product
 // @route   POST /api/products
-// @access  Private/Admin
 const createProduct = async (req, res) => {
   try {
     const { name, description, price, sizes, category, images, isFeatured } = req.body;
 
-    const product = new Product({
-      name,
-      description,
-      price,
-      sizes: sizes || [],
-      category,
-      images,
-      isFeatured
+    const createdProduct = await prisma.product.create({
+      data: {
+        name,
+        description,
+        price,
+        category,
+        isFeatured,
+        images: {
+          create: {
+            front: images?.front || '',
+            side: images?.side || '',
+            back: images?.back || '',
+            perspective: images?.perspective || ''
+          }
+        },
+        sizes: {
+          create: sizes?.map(s => ({
+            size: s.size,
+            quantity: s.quantity
+          })) || []
+        }
+      },
+      include: { sizes: true, images: true }
     });
 
-    const createdProduct = await product.save();
-
-    // Log Action
-    await AdminLog.create({
-      adminId: req.user._id,
-      actionType: 'CREATE_PRODUCT',
-      targetDocument: createdProduct._id.toString(),
-      details: `Created product: ${createdProduct.name}`
+    await prisma.adminLog.create({
+      data: {
+        adminId: req.user.id,
+        actionType: 'CREATE_PRODUCT',
+        targetDocument: createdProduct.id,
+        details: `Created product: ${createdProduct.name}`
+      }
     });
 
-    res.status(201).json(createdProduct);
+    if (redis) await redis.flushdb();
+
+    res.status(201).json({ ...createdProduct, _id: createdProduct.id, images: createdProduct.images || {} });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -77,39 +109,52 @@ const createProduct = async (req, res) => {
 
 // @desc    Update a product
 // @route   PUT /api/products/:id
-// @access  Private/Admin
 const updateProduct = async (req, res) => {
   try {
-    const {
-      name,
-      price,
-      description,
-      images, // Object { front, side, back }
-      category,
-      sizes,
-    } = req.body;
+    const { name, price, description, images, category, sizes } = req.body;
 
-    const product = await Product.findById(req.params.id);
+    const product = await prisma.product.findUnique({ where: { id: req.params.id } });
 
     if (product) {
-      product.name = name || product.name;
-      product.price = price || product.price;
-      product.description = description || product.description;
-      product.images = images || product.images;
-      product.category = category || product.category;
-      product.sizes = sizes || product.sizes;
-
-      const updatedProduct = await product.save();
-      
-      // Log Action
-      await AdminLog.create({
-        adminId: req.user._id,
-        actionType: 'UPDATE_PRODUCT',
-        targetDocument: updatedProduct._id.toString(),
-        details: `Updated product: ${updatedProduct.name}`
+      const updatedProduct = await prisma.product.update({
+        where: { id: req.params.id },
+        data: {
+          ...(name && { name }),
+          ...(price !== undefined && { price }),
+          ...(description && { description }),
+          ...(category && { category }),
+          ...(images && {
+             images: {
+               upsert: {
+                 create: { front: images.front, side: images.side, back: images.back, perspective: images.perspective },
+                 update: { front: images.front, side: images.side, back: images.back, perspective: images.perspective }
+               }
+             }
+          })
+        },
+        include: { sizes: true, images: true }
       });
 
-      res.json(updatedProduct);
+      if (sizes) {
+         await prisma.productSize.deleteMany({ where: { productId: product.id } });
+         await prisma.productSize.createMany({
+            data: sizes.map(s => ({ productId: product.id, size: s.size, quantity: s.quantity }))
+         });
+      }
+
+      await prisma.adminLog.create({
+        data: {
+          adminId: req.user.id,
+          actionType: 'UPDATE_PRODUCT',
+          targetDocument: product.id,
+          details: `Updated product: ${updatedProduct.name}`
+        }
+      });
+
+      if (redis) await redis.flushdb();
+
+      const finalProduct = await prisma.product.findUnique({ where: { id: req.params.id }, include: { sizes: true, images: true } });
+      res.json({ ...finalProduct, _id: finalProduct.id, images: finalProduct.images || {} });
     } else {
       res.status(404).json({ message: 'Product not found' });
     }
@@ -120,22 +165,23 @@ const updateProduct = async (req, res) => {
 
 // @desc    Delete a product
 // @route   DELETE /api/products/:id
-// @access  Private/Admin
 const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await prisma.product.findUnique({ where: { id: req.params.id } });
 
     if (product) {
-      const productName = product.name;
-      await product.deleteOne();
+      await prisma.product.delete({ where: { id: req.params.id } });
 
-      // Log Action
-      await AdminLog.create({
-        adminId: req.user._id,
-        actionType: 'DELETE_PRODUCT',
-        targetDocument: req.params.id,
-        details: `Deleted product: ${productName}`
+      await prisma.adminLog.create({
+        data: {
+          adminId: req.user.id,
+          actionType: 'DELETE_PRODUCT',
+          targetDocument: req.params.id,
+          details: `Deleted product: ${product.name}`
+        }
       });
+
+      if (redis) await redis.flushdb();
 
       res.json({ message: 'Product removed' });
     } else {

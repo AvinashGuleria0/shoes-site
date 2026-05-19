@@ -3,14 +3,11 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
-const connectDB = require('./config/db');
 const path = require('path');
+const prisma = require('./config/prisma'); // Init Prisma Client
 
 // Load env vars
 dotenv.config();
-
-// Connect to database
-connectDB();
 
 const app = express();
 const server = http.createServer(app);
@@ -19,7 +16,7 @@ const server = http.createServer(app);
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000', 
-  'https://shoes-site-padvyk.vercel.app',
+  'https://kicks-store.vercel.app',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 

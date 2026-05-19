@@ -62,9 +62,9 @@ const Header = () => {
     <header className="fixed w-full z-50 transition-all duration-300 bg-white/70 backdrop-blur-xl border-b border-gray-200/50 text-gray-800 dark:text-white dark:bg-black/70 dark:border-white/10 shadow-sm">
       <nav className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
         {/* LOGO */}
-        <Link to="/" className="flex items-center gap-2 relative z-10" title="PADVYK CREATIONS PRIVATE LIMITED">
-          <img src={logo} alt="PADVYK CREATIONS" className="h-10 sm:h-12 w-auto object-contain" />
-          <span className="hidden md:block text-sm lg:text-base font-bold tracking-tight">PADVYK CREATIONS</span>
+        <Link to="/" className="flex items-center gap-2 relative z-10" title="Kicks Store">
+          <img src={logo} alt="Kicks" className="h-10 sm:h-12 w-auto object-contain" />
+          <span className="hidden md:block text-sm lg:text-base font-bold tracking-tight">KICKS</span>
         </Link>
 
         {/* NAVIGATION LINKS - Hidden on mobile */}
@@ -134,7 +134,7 @@ const Header = () => {
               {/* Profile Button - Visible on all sizes */}
               <Link to="/profile" className="hover:text-red-500 transition-colors flex items-center gap-1 sm:gap-2">
                 <FaUser className="text-lg sm:text-xl" />
-                <span className="hidden sm:inline text-xs uppercase font-bold text-gray-500">{userInfo.name.split(' ')[0]}</span>
+                <span className="hidden sm:inline text-xs uppercase font-bold text-gray-500">{userInfo.name ? userInfo.name.split(' ')[0] : 'USER'}</span>
               </Link>
 
               {/* ADMIN LINK */}
@@ -229,7 +229,7 @@ const Header = () => {
                     className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-zinc-900 rounded-xl"
                   >
                     <div className="w-12 h-12 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center font-black text-lg">
-                      {userInfo.name.charAt(0).toUpperCase()}
+                      {userInfo.name ? userInfo.name.charAt(0).toUpperCase() : 'U'}
                     </div>
                     <div>
                       <p className="font-bold">{userInfo.name}</p>

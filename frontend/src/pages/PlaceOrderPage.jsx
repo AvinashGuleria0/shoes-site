@@ -98,7 +98,7 @@ const PlaceOrderPage = () => {
             key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'placeholder', 
             amount: order.totalPrice * 100,
             currency: "INR",
-            name: "PADVYK CREATIONS PRIVATE LIMITED",
+            name: "Kicks",
             description: `Order #${order._id}`,
             image: logo,
             order_id: order.razorpayOrderId, 
