@@ -80,14 +80,16 @@ const registerUser = async (req, res) => {
 
     console.log(`[OTP] Registration OTP for ${email}: ${otpValue}`);
 
-    // If email could not be delivered, include OTP in response so user can still verify
+    // If email could not be delivered, log it but don't expose OTP in response
+    if (!emailSent) {
+      console.warn(`⚠️  [OTP] Email failed for ${email}. Check GMAIL_USER and GMAIL_APP_PASSWORD in .env`);
+    }
+
     res.status(201).json({
       message: emailSent
         ? 'Registration successful! Check your email for the OTP.'
-        : 'Registration successful! Email delivery unavailable — use the OTP below to verify.',
-      email: user.email,
-      // Only expose OTP in response when email delivery failed
-      ...(emailSent ? {} : { devOtp: otpValue })
+        : 'Registration successful! We had trouble sending your OTP email — please contact support.',
+      email: user.email
     });
   } else {
     res.status(400).json({ message: 'Invalid user data' });
@@ -363,7 +365,7 @@ const handleContactForm = async (req, res) => {
   try {
     // Send email to support/admin
     await sendEmail({
-      to: 'avinash.guleria.s84@kalvium.community',
+      to: 'avinashguleria1009@gmail.com',
       subject: `New Customer Query: ${query}`,
       html: `
         <div style="background-color: #09090b; padding: 30px; font-family: sans-serif; color: #ffffff; border-radius: 12px; border: 1px solid #27272a; max-width: 600px; margin: 0 auto;">

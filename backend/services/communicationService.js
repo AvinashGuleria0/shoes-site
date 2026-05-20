@@ -1,47 +1,53 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 const axios = require('axios');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Create Gmail transporter — reused across all sends
+let transporter = null;
+
+const getTransporter = () => {
+  if (transporter) return transporter;
+
+  const user = process.env.GMAIL_USER;
+  const pass = process.env.GMAIL_APP_PASSWORD;
+
+  if (!user || !pass || user === 'placeholder' || pass === 'placeholder') {
+    return null;
+  }
+
+  transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user, pass }
+  });
+
+  return transporter;
+};
 
 const sendEmail = async ({ to, subject, html }) => {
   console.log(`\n📧 [Email Service] Attempting to send email...`);
   console.log(`   ➤ To      : ${to}`);
   console.log(`   ➤ Subject : ${subject}`);
-  console.log(`   ➤ API Key : ${process.env.RESEND_API_KEY ? `SET (${process.env.RESEND_API_KEY.slice(0, 8)}...)` : 'NOT SET ❌'}`);
+
+  const mail = getTransporter();
+
+  if (!mail) {
+    console.warn(`⚠️  [Email Service] Gmail credentials not configured — MOCK mode. Email NOT sent.`);
+    console.log(`   ➤ Set GMAIL_USER and GMAIL_APP_PASSWORD in your .env to enable real emails.`);
+    return false;
+  }
 
   try {
-    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'placeholder') {
-      console.warn(`⚠️  [Email Service] No valid API key found — running in MOCK mode. Email NOT sent.`);
-      console.log(`   [Mock Email] To: ${to} | Subject: ${subject}`);
-      return true;
-    }
-
-    console.log(`   ➤ From    : Kicks Store <avinash.guleria.s84@kalvium.community>`);
-    console.log(`   ⏳ Sending via Resend...`);
-
-    const result = await resend.emails.send({
-      from: 'Kicks Store <onboarding@resend.dev>',
+    const info = await mail.sendMail({
+      from: `"Kicks Store" <${process.env.GMAIL_USER}>`,
       to,
       subject,
       html
     });
 
-    console.log(`📬 [Email Service] Raw Resend response:`, JSON.stringify(result, null, 2));
-
-    if (result?.error) {
-      console.error(`❌ [Email Service] Resend returned an error inside response!`);
-      console.error(`   ➤ Error:`, result.error);
-      return false;
-    }
-
-    const emailId = result?.data?.id || result?.id;
-    console.log(`✅ [Email Service] Email sent successfully! ID: ${emailId || 'N/A (check raw response above)'}`);
+    console.log(`✅ [Email Service] Email sent! Message ID: ${info.messageId}`);
     return true;
   } catch (error) {
-    console.error(`❌ [Email Service] FAILED to send email!`);
-    console.error(`   ➤ Error Message : ${error.message}`);
-    console.error(`   ➤ Error Name    : ${error.name}`);
-    console.error(`   ➤ Full Error    :`, error);
+    console.error(`❌ [Email Service] Failed to send email!`);
+    console.error(`   ➤ Error: ${error.message}`);
     return false;
   }
 };
@@ -53,7 +59,6 @@ const sendWhatsApp = async ({ phone, message }) => {
   }
 
   try {
-    // Ensure phone number has country code (assuming India 91 if not provided)
     let formattedPhone = phone.toString();
     if (formattedPhone.length === 10) formattedPhone = `91${formattedPhone}`;
 

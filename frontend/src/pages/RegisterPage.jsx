@@ -13,9 +13,9 @@ const RegisterPage = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [phone, setPhone] = useState('');
     
+    // OTP Verification State
     const [isOtpStep, setIsOtpStep] = useState(false);
     const [otp, setOtp] = useState('');
-    const [fallbackOtp, setFallbackOtp] = useState(null); // shown when email can't be delivered
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -41,9 +41,6 @@ const RegisterPage = () => {
       try {
             const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/users`, { name, email, password, phone });
             toast.success(res.data.message);
-            if (res.data.devOtp) {
-              setFallbackOtp(res.data.devOtp);
-            }
             setIsOtpStep(true);
       } catch (err) {
             toast.error(err?.response?.data?.message || err.message);
@@ -84,16 +81,7 @@ const RegisterPage = () => {
         {isOtpStep ? (
           <>
             <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-center text-gray-800 dark:text-white">Verify Account</h1>
-            <p className="text-center text-sm text-gray-500 mb-4">Enter the 6-digit OTP sent to your email or WhatsApp.</p>
-            
-            {fallbackOtp && (
-              <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 rounded-xl text-center">
-                <p className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">⚠️ Email delivery unavailable</p>
-                <p className="text-xs text-amber-700 dark:text-amber-300 mb-2">Use this OTP to verify your account:</p>
-                <p className="text-3xl font-black tracking-widest text-amber-700 dark:text-amber-300">{fallbackOtp}</p>
-              </div>
-            )}
-
+            <p className="text-center text-sm text-gray-500 mb-6">Enter the 6-digit OTP sent to your email.</p>
             <form onSubmit={verifyOtpHandler}>
               <div className="mb-6">
                 <label className="block text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-bold mb-2">One-Time Password</label>
