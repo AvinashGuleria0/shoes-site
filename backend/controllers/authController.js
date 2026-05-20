@@ -53,7 +53,7 @@ const registerUser = async (req, res) => {
     data: {
       name,
       email,
-      phone,
+      phone: phone || null,
       password: hashedPassword,
       isActive: false // Require OTP verification
     }
