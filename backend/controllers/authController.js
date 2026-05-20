@@ -139,10 +139,11 @@ const verifyOtp = async (req, res) => {
     });
     
     // Welcome Messages
+    const { getWelcomeEmailTemplate } = require('../utils/emailTemplates');
     await sendEmail({
       to: user.email,
       subject: 'Welcome to Kicks!',
-      html: `<h1>Welcome, ${user.name}!</h1><p>Your account is fully verified. Start shopping today!</p>`
+      html: getWelcomeEmailTemplate(user.name, process.env.FRONTEND_URL)
     });
     
     if (user.phone) {
@@ -222,10 +223,11 @@ const googleLogin = async (req, res) => {
       });
       
       // Send Welcome Message
+      const { getWelcomeEmailTemplate } = require('../utils/emailTemplates');
       await sendEmail({
         to: user.email,
         subject: 'Welcome to Kicks!',
-        html: `<h1>Welcome, ${user.name}!</h1><p>Thanks for joining via Google. Start shopping today!</p>`
+        html: getWelcomeEmailTemplate(user.name, process.env.FRONTEND_URL)
       });
     }
 
@@ -343,6 +345,42 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// @desc    Contact Form Submission
+// @route   POST /api/users/contact
+const handleContactForm = async (req, res) => {
+  const { name, email, query, message } = req.body;
+
+  if (!name || !email || !query || !message) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  try {
+    // Send email to support/admin
+    await sendEmail({
+      to: 'support@kicks.com',
+      subject: `New Customer Query: ${query}`,
+      html: `
+        <div style="background-color: #09090b; padding: 30px; font-family: sans-serif; color: #ffffff; border-radius: 12px; border: 1px solid #27272a; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #f97316; margin-top: 0; letter-spacing: 1px;">KICKS SUPPORT - NEW QUERY</h2>
+          <hr style="border: 0; border-top: 1px solid #27272a; margin-bottom: 20px;" />
+          <p style="margin: 8px 0;"><strong>Name:</strong> ${name}</p>
+          <p style="margin: 8px 0;"><strong>Email Address:</strong> ${email}</p>
+          <p style="margin: 8px 0;"><strong>Query Category:</strong> ${query}</p>
+          <div style="background-color: #18181b; padding: 20px; border-radius: 8px; border: 1px solid #27272a; margin-top: 20px;">
+            <p style="margin: 0 0 10px; font-weight: bold; color: #a1a1aa;">Message:</p>
+            <p style="margin: 0; line-height: 1.6; color: #e4e4e7;">${message}</p>
+          </div>
+        </div>
+      `
+    });
+
+    res.status(200).json({ message: 'Your message has been sent successfully!' });
+  } catch (error) {
+    console.error('Contact Form Error:', error.message);
+    res.status(500).json({ message: 'Failed to send message' });
+  }
+};
+
 module.exports = {
   authUser,
   registerUser,
@@ -353,5 +391,6 @@ module.exports = {
   addAdminUser,
   getAdmins,
   updateUserStatus,
-  deleteUser
+  deleteUser,
+  handleContactForm
 };

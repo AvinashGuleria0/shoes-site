@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 import { SkeletonHero } from '../components/Skeleton';
-import { FaArrowRight, FaShippingFast, FaUndo, FaHeadset, FaStar } from 'react-icons/fa';
+import { FaArrowRight, FaShippingFast, FaUndo, FaHeadset, FaStar, FaPaperPlane } from 'react-icons/fa';
 import logo from '../assets/logo.jpeg';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -27,6 +27,32 @@ const HomePage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHeroSize, setSelectedHeroSize] = useState('');
+
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    query: '',
+    message: ''
+  });
+  const [sendingContact, setSendingContact] = useState(false);
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    if (!contactForm.name || !contactForm.email || !contactForm.query || !contactForm.message) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    setSendingContact(true);
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/users/contact`, contactForm);
+      toast.success('Your message has been sent successfully!');
+      setContactForm({ name: '', email: '', query: '', message: '' });
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to send message');
+    } finally {
+      setSendingContact(false);
+    }
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -318,6 +344,119 @@ const HomePage = () => {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ========== CONTACT SECTION ========== */}
+      <section className="bg-zinc-100 dark:bg-[#0c0c0e] py-16 sm:py-24 px-4 sm:px-6 md:px-12 transition-colors duration-500 overflow-hidden relative">
+        <div className="container mx-auto max-w-5xl flex flex-col md:flex-row gap-0 rounded-3xl overflow-hidden shadow-2xl border border-zinc-200 dark:border-zinc-800">
+          
+          {/* Left Column: Contact Me Info */}
+          <div className="flex-1 bg-zinc-200 dark:bg-zinc-900 p-8 sm:p-12 md:p-16 flex flex-col justify-between relative border-b-8 border-orange-500 md:border-b-0 md:border-r-8 md:border-r-orange-500">
+            {/* Top Decorative Diagonal Accent */}
+            <div className="absolute top-8 right-8 w-8 h-8 border-2 border-orange-500 transform rotate-45 flex items-center justify-center">
+              <div className="w-4 h-4 bg-orange-500"></div>
+            </div>
+            
+            <div className="my-auto">
+              <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-8 text-black dark:text-white">
+                Contact Me<span className="text-orange-500">.</span>
+              </h2>
+              
+              <div className="space-y-6 text-zinc-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed">
+                <p className="border-l-4 border-orange-500 pl-4 font-medium italic">
+                  "I will read all mails you send me. I literally mean it. So if you want to share something, feel free to reach out."
+                </p>
+                <p>
+                  I need your <strong className="text-black dark:text-white font-bold">Name</strong> and <strong className="text-black dark:text-white font-bold">Gmail address</strong> for communicating.
+                </p>
+              </div>
+            </div>
+            
+            {/* Hand-drawn styled arrow indicator at the bottom (shown as SVG pointing down-right) */}
+            <div className="hidden md:block absolute bottom-8 left-12 opacity-50 dark:invert text-zinc-500">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 5C10 15 20 25 30 25" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeDasharray="4 4" />
+                <path d="M22 20L30 25L25 33" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
+          
+          {/* Right Column: Send Message Form */}
+          <div className="flex-1 bg-black p-8 sm:p-12 md:p-16 text-white">
+            <h3 className="text-2xl sm:text-3xl font-black tracking-tight mb-8">
+              Send Me a Message<span className="text-orange-500">.</span>
+            </h3>
+            
+            <form onSubmit={handleContactSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-2 font-bold">Your Name</label>
+                  <input 
+                    type="text" 
+                    placeholder="Your Name"
+                    required
+                    value={contactForm.name}
+                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                    className="w-full bg-[#141416] border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-2 font-bold">Email Address</label>
+                  <input 
+                    type="email" 
+                    placeholder="Email Address"
+                    required
+                    value={contactForm.email}
+                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                    className="w-full bg-[#141416] border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-colors"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-2 font-bold">Query / Topic</label>
+                <select
+                  required
+                  value={contactForm.query}
+                  onChange={(e) => setContactForm({ ...contactForm, query: e.target.value })}
+                  className="w-full bg-[#141416] border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-colors text-zinc-300"
+                >
+                  <option value="" disabled>Select Your Query Type</option>
+                  <option value="Order Support">Order & Delivery Support</option>
+                  <option value="Product Question">Product Availability & Sizing</option>
+                  <option value="Business Inquiry">Business Cooperation / Wholesales</option>
+                  <option value="Feedback">Feedback / Suggestions</option>
+                  <option value="Other">Other Issues</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-2 font-bold">Message</label>
+                <textarea 
+                  rows="4"
+                  placeholder="Tell me what's on your mind..."
+                  required
+                  value={contactForm.message}
+                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                  className="w-full bg-[#141416] border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-colors resize-none"
+                ></textarea>
+              </div>
+              
+              <button 
+                type="submit"
+                disabled={sendingContact}
+                className="w-full py-4 px-6 bg-orange-600 hover:bg-orange-500 disabled:bg-zinc-800 text-white rounded-xl font-bold uppercase tracking-wider flex items-center justify-center gap-3 transition-all transform hover:scale-[1.01] active:scale-95 cursor-pointer shadow-lg shadow-orange-500/20"
+              >
+                {sendingContact ? 'Sending...' : (
+                  <>
+                    Send Message <FaPaperPlane size={14} />
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+          
         </div>
       </section>
 
