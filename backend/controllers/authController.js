@@ -357,7 +357,7 @@ const handleContactForm = async (req, res) => {
   try {
     // Send email to support/admin
     await sendEmail({
-      to: 'support@kicks.com',
+      to: 'avinash.guleria.s84@kalvium.community',
       subject: `New Customer Query: ${query}`,
       html: `
         <div style="background-color: #09090b; padding: 30px; font-family: sans-serif; color: #ffffff; border-radius: 12px; border: 1px solid #27272a; max-width: 600px; margin: 0 auto;">

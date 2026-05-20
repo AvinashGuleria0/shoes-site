@@ -16,7 +16,6 @@ const server = http.createServer(app);
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000', 
-  'https://kicks-store.vercel.app',
   'https://kicks-shoestore.vercel.app',
   process.env.FRONTEND_URL
 ].filter(Boolean);

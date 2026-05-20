@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../store/cartSlice';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 import { SkeletonHero } from '../components/Skeleton';
@@ -24,6 +24,9 @@ const HomePage = () => {
   const compareRef = useRef(null);
   
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { userInfo } = useSelector((state) => state.auth);
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedHeroSize, setSelectedHeroSize] = useState('');
@@ -36,17 +39,70 @@ const HomePage = () => {
   });
   const [sendingContact, setSendingContact] = useState(false);
 
+  // Restore draft message from localStorage on mount/auth state change, or auto-fill name & email if logged in
+  useEffect(() => {
+    const savedDraft = localStorage.getItem('kicks_contact_draft');
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft);
+        setContactForm({
+          query: draft.query || '',
+          message: draft.message || '',
+          name: userInfo?.name || draft.name || '',
+          email: userInfo?.email || draft.email || ''
+        });
+        localStorage.removeItem('kicks_contact_draft');
+        if (userInfo) {
+          toast.success('Welcome back! Your message draft has been restored.');
+        } else {
+          toast.info('Your draft message has been restored.');
+        }
+      } catch (e) {
+        console.error('Failed to parse contact draft', e);
+      }
+    } else {
+      setContactForm(prev => ({
+        ...prev,
+        name: userInfo?.name || '',
+        email: userInfo?.email || ''
+      }));
+    }
+  }, [userInfo]);
+
   const handleContactSubmit = async (e) => {
     e.preventDefault();
-    if (!contactForm.name || !contactForm.email || !contactForm.query || !contactForm.message) {
+    
+    if (!userInfo) {
+      // Save form draft to localStorage
+      localStorage.setItem('kicks_contact_draft', JSON.stringify(contactForm));
+      toast.warning('Please sign in to send a message. Your draft has been saved!');
+      navigate('/login?redirect=/');
+      return;
+    }
+
+    const nameToSend = userInfo.name || contactForm.name;
+    const emailToSend = userInfo.email || contactForm.email;
+
+    if (!nameToSend || !emailToSend || !contactForm.query || !contactForm.message) {
       toast.error('Please fill in all fields');
       return;
     }
+
     setSendingContact(true);
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/users/contact`, contactForm);
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/users/contact`, {
+        name: nameToSend,
+        email: emailToSend,
+        query: contactForm.query,
+        message: contactForm.message
+      });
       toast.success('Your message has been sent successfully!');
-      setContactForm({ name: '', email: '', query: '', message: '' });
+      setContactForm({
+        name: userInfo.name || '',
+        email: userInfo.email || '',
+        query: '',
+        message: ''
+      });
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to send message');
     } finally {
@@ -383,36 +439,49 @@ const HomePage = () => {
           </div>
           
           {/* Right Column: Send Message Form */}
-          <div className="flex-1 bg-black p-8 sm:p-12 md:p-16 text-white">
+          <div className="flex-1 bg-white dark:bg-[#101012] p-8 sm:p-12 md:p-16 text-zinc-900 dark:text-white border-t md:border-t-0 md:border-l border-zinc-200 dark:border-zinc-800/80 transition-colors duration-500">
             <h3 className="text-2xl sm:text-3xl font-black tracking-tight mb-8">
               Send Me a Message<span className="text-orange-500">.</span>
             </h3>
             
             <form onSubmit={handleContactSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-2 font-bold">Your Name</label>
-                  <input 
-                    type="text" 
-                    placeholder="Your Name"
-                    required
-                    value={contactForm.name}
-                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                    className="w-full bg-[#141416] border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-colors"
-                  />
+              {userInfo ? (
+                <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/50 rounded-2xl p-4 sm:p-5 flex items-center gap-4 transition-all duration-300">
+                  <div className="w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-orange-500/20 flex-shrink-0 animate-pulse">
+                    {userInfo.name ? userInfo.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-orange-600 dark:text-orange-400 font-black mb-0.5">Signed In As</p>
+                    <h4 className="text-sm sm:text-base font-extrabold text-zinc-900 dark:text-white leading-tight">{userInfo.name}</h4>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium break-all">{userInfo.email}</p>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-2 font-bold">Email Address</label>
-                  <input 
-                    type="email" 
-                    placeholder="Email Address"
-                    required
-                    value={contactForm.email}
-                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                    className="w-full bg-[#141416] border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-colors"
-                  />
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-2 font-bold">Your Name</label>
+                    <input 
+                      type="text" 
+                      placeholder="Your Name"
+                      required
+                      value={contactForm.name}
+                      onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                      className="w-full bg-zinc-50 dark:bg-[#141416] border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-orange-500 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-2 font-bold">Email Address</label>
+                    <input 
+                      type="email" 
+                      placeholder="Email Address"
+                      required
+                      value={contactForm.email}
+                      onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                      className="w-full bg-zinc-50 dark:bg-[#141416] border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-orange-500 transition-colors"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
               
               <div>
                 <label className="block text-xs uppercase tracking-wider text-zinc-500 mb-2 font-bold">Query / Topic</label>
@@ -420,14 +489,14 @@ const HomePage = () => {
                   required
                   value={contactForm.query}
                   onChange={(e) => setContactForm({ ...contactForm, query: e.target.value })}
-                  className="w-full bg-[#141416] border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-colors text-zinc-300"
+                  className="w-full bg-zinc-50 dark:bg-[#141416] border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-colors text-zinc-900 dark:text-zinc-300"
                 >
-                  <option value="" disabled>Select Your Query Type</option>
-                  <option value="Order Support">Order & Delivery Support</option>
-                  <option value="Product Question">Product Availability & Sizing</option>
-                  <option value="Business Inquiry">Business Cooperation / Wholesales</option>
-                  <option value="Feedback">Feedback / Suggestions</option>
-                  <option value="Other">Other Issues</option>
+                  <option value="" disabled className="bg-white dark:bg-[#141416] text-zinc-500">Select Your Query Type</option>
+                  <option value="Order Support" className="bg-white dark:bg-[#141416] text-zinc-900 dark:text-white">Order & Delivery Support</option>
+                  <option value="Product Question" className="bg-white dark:bg-[#141416] text-zinc-900 dark:text-white">Product Availability & Sizing</option>
+                  <option value="Business Inquiry" className="bg-white dark:bg-[#141416] text-zinc-900 dark:text-white">Business Cooperation / Wholesales</option>
+                  <option value="Feedback" className="bg-white dark:bg-[#141416] text-zinc-900 dark:text-white">Feedback / Suggestions</option>
+                  <option value="Other" className="bg-white dark:bg-[#141416] text-zinc-900 dark:text-white">Other Issues</option>
                 </select>
               </div>
               
@@ -439,14 +508,14 @@ const HomePage = () => {
                   required
                   value={contactForm.message}
                   onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                  className="w-full bg-[#141416] border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition-colors resize-none"
+                  className="w-full bg-zinc-50 dark:bg-[#141416] border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-orange-500 transition-colors resize-none"
                 ></textarea>
               </div>
               
               <button 
                 type="submit"
                 disabled={sendingContact}
-                className="w-full py-4 px-6 bg-orange-600 hover:bg-orange-500 disabled:bg-zinc-800 text-white rounded-xl font-bold uppercase tracking-wider flex items-center justify-center gap-3 transition-all transform hover:scale-[1.01] active:scale-95 cursor-pointer shadow-lg shadow-orange-500/20"
+                className="w-full py-4 px-6 bg-orange-600 hover:bg-orange-500 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 text-white rounded-xl font-bold uppercase tracking-wider flex items-center justify-center gap-3 transition-all transform hover:scale-[1.01] active:scale-95 cursor-pointer shadow-lg shadow-orange-500/20"
               >
                 {sendingContact ? 'Sending...' : (
                   <>
@@ -456,6 +525,7 @@ const HomePage = () => {
               </button>
             </form>
           </div>
+
           
         </div>
       </section>
