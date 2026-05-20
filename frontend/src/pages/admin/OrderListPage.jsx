@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { SkeletonTable } from '../../components/Skeleton';
 import { FaSearch } from 'react-icons/fa';
 
 const OrderListPage = () => {
@@ -11,12 +12,14 @@ const OrderListPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
     const [sortBy, setSortBy] = useState('newest');
+    const [loading, setLoading] = useState(true);
 
     const { userInfo } = useSelector(state => state.auth);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchOrders = async () => {
+            setLoading(true);
             try {
                 const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/orders`, {
                     headers: { Authorization: `Bearer ${userInfo.token}` }
@@ -25,6 +28,8 @@ const OrderListPage = () => {
                 setFilteredOrders(data);
             } catch (error) {
                 toast.error(error.response?.data?.message || error.message);
+            } finally {
+                setLoading(false);
             }
         };
         fetchOrders();
@@ -167,7 +172,9 @@ const OrderListPage = () => {
                 </div>
             </div>
 
-            {filteredOrders.length === 0 ? (
+            {loading ? (
+                <SkeletonTable rows={5} cols={7} />
+            ) : filteredOrders.length === 0 ? (
                 <div className="bg-gray-50 dark:bg-zinc-900 rounded-xl p-8 text-center">
                     <p className="font-bold text-gray-500">No orders found matching your criteria.</p>
                 </div>

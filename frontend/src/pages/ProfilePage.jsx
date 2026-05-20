@@ -5,6 +5,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FaUser, FaBoxOpen, FaSignOutAlt } from 'react-icons/fa';
 import { logout } from '../store/authSlice';
+import { SkeletonOrderCard } from '../components/Skeleton';
 
 const ProfilePage = () => {
     const { userInfo } = useSelector((state) => state.auth);
@@ -122,7 +123,11 @@ const ProfilePage = () => {
                         </div>
 
                         {loading ? (
-                            <p className="font-bold animate-pulse">Loading orders...</p>
+                            <div className="space-y-4 sm:space-y-6">
+                                {[...Array(3)].map((_, idx) => (
+                                    <SkeletonOrderCard key={idx} />
+                                ))}
+                            </div>
                         ) : orders.length === 0 ? (
                             <div className="bg-gray-50 dark:bg-zinc-900 p-8 sm:p-12 rounded-2xl sm:rounded-3xl text-center">
                                 <p className="font-bold text-lg sm:text-xl mb-4">You haven't placed any orders yet.</p>

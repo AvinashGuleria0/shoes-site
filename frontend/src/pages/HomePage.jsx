@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
+import { SkeletonHero } from '../components/Skeleton';
 import { FaArrowRight, FaShippingFast, FaUndo, FaHeadset, FaStar } from 'react-icons/fa';
 import logo from '../assets/logo.jpeg';
 
@@ -24,30 +25,33 @@ const HomePage = () => {
   
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedHeroSize, setSelectedHeroSize] = useState('');
 
- useEffect(() => {
-  const fetchProducts = async () => {
-    try {
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
-      
-      // Handle different API response structures safely
-      const productsArray = Array.isArray(data) ? data : (data?.products || []);
-      
-      setProducts(productsArray);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
+        
+        // Handle different API response structures safely
+        const productsArray = Array.isArray(data) ? data : (data?.products || []);
+        
+        setProducts(productsArray);
 
-      const featured = productsArray.find(p => p.isFeatured) || productsArray[0];
-      if (featured && featured.sizes && featured.sizes.length > 0) {
-        setSelectedHeroSize(featured.sizes[0].size);
+        const featured = productsArray.find(p => p.isFeatured) || productsArray[0];
+        if (featured && featured.sizes && featured.sizes.length > 0) {
+          setSelectedHeroSize(featured.sizes[0].size);
+        }
+      } catch (error) {
+        console.error("Failed to fetch products", error);
+        setProducts([]); 
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Failed to fetch products", error);
-      // Keep it as an empty array on failure so .find() doesn't break later
-      setProducts([]); 
-    }
-  };
-  fetchProducts();
-}, []);
+    };
+    fetchProducts();
+  }, []);
 
   const featuredProduct = products.find(p => p.isFeatured) || products[0];
 
@@ -141,6 +145,10 @@ const HomePage = () => {
 
   // Compare products (use first 2)
   const compareProducts = products.slice(0, 2);
+
+  if (loading) {
+    return <SkeletonHero />;
+  }
 
   return (
     <div ref={heroRef} className="bg-gray-50 dark:bg-deep-void text-gray-900 dark:text-white transition-colors duration-500">

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { SkeletonOrderDetails } from '../components/Skeleton';
 import { FaArrowLeft, FaBox, FaUser, FaCreditCard, FaMapMarkerAlt, FaCheckCircle, FaTimesCircle, FaTruck } from 'react-icons/fa';
 
 const UserOrderDetailsPage = () => {
@@ -28,7 +29,13 @@ const UserOrderDetailsPage = () => {
         fetchOrder();
     }, [orderId, userInfo]);
 
-    if (loading) return <div className="pt-32 text-center font-bold">Loading Order Details...</div>;
+    if (loading) {
+        return (
+            <div className="pt-20 sm:pt-24 pb-12 sm:pb-20 min-h-screen bg-gray-50 dark:bg-deep-void transition-colors">
+                <SkeletonOrderDetails />
+            </div>
+        );
+    }
     if (!order) return <div className="pt-32 text-center font-bold text-red-500">Order Not Found</div>;
 
     return (
