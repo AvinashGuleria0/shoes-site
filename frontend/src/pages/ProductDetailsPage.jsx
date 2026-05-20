@@ -5,6 +5,7 @@ import { addToCart } from '../store/cartSlice';
 import { addToWishlist, removeFromWishlist } from '../store/wishlistSlice';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { SkeletonProductDetails } from '../components/Skeleton';
 import { FaShoppingCart, FaArrowLeft, FaHeart, FaShippingFast, FaUndo, FaShieldAlt, FaMinus, FaPlus } from 'react-icons/fa';
 import { gsap } from 'gsap';
 
@@ -105,9 +106,8 @@ const ProductDetailsPage = () => {
 
   if (loading) {
     return (
-      <div className="pt-32 min-h-screen flex flex-col items-center justify-center bg-white dark:bg-deep-void">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-red-600 mb-4"></div>
-        <span className="font-bold uppercase tracking-widest text-gray-500 animate-pulse">Loading product...</span>
+      <div className="pt-16 sm:pt-20 min-h-screen bg-white dark:bg-deep-void transition-colors duration-300">
+        <SkeletonProductDetails />
       </div>
     );
   }

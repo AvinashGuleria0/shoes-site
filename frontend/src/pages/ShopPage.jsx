@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
+import { SkeletonProductCard } from '../components/Skeleton';
 import { FaSearch } from 'react-icons/fa';
 
 const ShopPage = () => {
@@ -78,9 +79,10 @@ const ShopPage = () => {
 
         {/* PRODUCT GRID */}
         {loading ? (
-          <div className="flex flex-col justify-center items-center h-64 gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
-            <span className="font-bold uppercase tracking-widest text-gray-500 animate-pulse text-sm">Loading kicks...</span>
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+            {[...Array(8)].map((_, idx) => (
+              <SkeletonProductCard key={idx} />
+            ))}
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12 sm:py-20 bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl px-4">

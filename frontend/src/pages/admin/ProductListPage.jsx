@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
+import { SkeletonTable } from '../../components/Skeleton';
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaFilter } from 'react-icons/fa';
 
 const ProductListPage = () => {
@@ -128,7 +129,7 @@ const ProductListPage = () => {
             </div>
 
             {loading ? (
-                 <div className="text-center py-20 font-bold animate-pulse">Fetching inventory...</div>
+                 <SkeletonTable rows={5} cols={5} />
             ) : filteredProducts.length === 0 ? (
                 <div className="text-center py-12 sm:py-20 bg-gray-50 dark:bg-zinc-900 rounded-2xl sm:rounded-3xl">
                     <p className="text-gray-400 font-bold">No products found.</p>
