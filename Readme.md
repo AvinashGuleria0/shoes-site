@@ -2,7 +2,7 @@
 
 A full-stack e-commerce web application specializing in footwear. Built with the MERN stack (MongoDB, Express, React, Node.js), this platform offers a seamless shopping experience with secure authentication, real-time features, and integrated payment processing. 
 
-**Live Demo:** [https://shoes-site-padvyk.vercel.app/](https://shoes-site-padvyk.vercel.app/)
+**Live Demo:** [https://kicks-shoestore.vercel.app/](https://kicks-shoestore.vercel.app/)
 
 
 https://github.com/user-attachments/assets/e76f89db-82f1-4ee3-95bf-7f1c7ff7bb26
