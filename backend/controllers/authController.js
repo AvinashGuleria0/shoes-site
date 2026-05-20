@@ -61,27 +61,33 @@ const registerUser = async (req, res) => {
 
   if (user) {
     const otpValue = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 15 * 60000); 
+    const expiresAt = new Date(Date.now() + 15 * 60000);
 
     await prisma.otp.create({
       data: { email, otp: otpValue, type: 'VERIFY_EMAIL', expiresAt }
     });
 
-    await sendEmail({
+    // Attempt email — non-blocking, won't crash registration if it fails
+    const emailSent = await sendEmail({
       to: email,
       subject: 'Verify your Kicks Account',
       html: `<h1>Welcome to Kicks!</h1><p>Your verification code is: <strong style="font-size:24px;">${otpValue}</strong></p><p>This code expires in 15 minutes.</p>`
     });
 
     if (phone) {
-       await sendWhatsApp({ phone, message: `Hi ${name}, your Kicks verification OTP is: ${otpValue}` });
+      await sendWhatsApp({ phone, message: `Hi ${name}, your Kicks verification OTP is: ${otpValue}` });
     }
 
-    console.log(`[DEV MODE] Registration OTP for ${email}: ${otpValue}`);
+    console.log(`[OTP] Registration OTP for ${email}: ${otpValue}`);
 
+    // If email could not be delivered, include OTP in response so user can still verify
     res.status(201).json({
-      message: 'User registered. Please verify OTP sent to your email/whatsapp.',
-      email: user.email
+      message: emailSent
+        ? 'Registration successful! Check your email for the OTP.'
+        : 'Registration successful! Email delivery unavailable — use the OTP below to verify.',
+      email: user.email,
+      // Only expose OTP in response when email delivery failed
+      ...(emailSent ? {} : { devOtp: otpValue })
     });
   } else {
     res.status(400).json({ message: 'Invalid user data' });
