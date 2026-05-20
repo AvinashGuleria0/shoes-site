@@ -1,5 +1,12 @@
 const nodemailer = require('nodemailer');
 const axios = require('axios');
+const dns = require('dns');
+
+// Force Node.js to prefer IPv4 over IPv6 when resolving DNS. 
+// This fixes ENETUNREACH / connection timeout errors on platforms like Render where IPv6 routing is unavailable.
+if (typeof dns.setDefaultResultOrder === 'function') {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 // Create Gmail transporter — reused across all sends
 let transporter = null;
@@ -14,9 +21,15 @@ const getTransporter = () => {
     return null;
   }
 
+  // Explicit SMTPS over port 465 with robust timeouts
   transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user, pass }
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, 
+    auth: { user, pass },
+    connectionTimeout: 10000, // 10s connection timeout
+    greetingTimeout: 10000,   // 10s greeting timeout
+    socketTimeout: 15000      // 15s socket timeout
   });
 
   return transporter;
