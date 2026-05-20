@@ -546,7 +546,7 @@ const HomePage = () => {
               <Link to="/cart" className="hover:text-red-500 transition-colors">Cart</Link>
               <Link to="/wishlist" className="hover:text-red-500 transition-colors">Wishlist</Link>
               <Link to="/profile" className="hover:text-red-500 transition-colors">Account</Link>
-              <a href="mailto:support@kicks.com" className="hover:text-red-500 transition-colors">Contact</a>
+              <a href="mailto:avinashguleria1009@gmail.com" className="hover:text-red-500 transition-colors">Contact</a>
             </div>
           </div>
           <div className="border-t border-gray-200 dark:border-zinc-800 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-gray-500 text-xs sm:text-sm">
