@@ -261,10 +261,11 @@ const getOrderById = async (req, res) => {
       const formattedOrder = {
          ...order,
          _id: order.id,
+         userId: order.user,
          orderItems: order.orderItems.map(item => ({
              ...item,
-             name: item.product.name,
-             image: item.product.images?.side || ''
+             name: item.product?.name || 'Unknown Product',
+             image: item.product?.images?.side || ''
          }))
       };
       res.json(formattedOrder);
@@ -296,7 +297,14 @@ const updateOrderStatus = async (req, res) => {
 
     const updatedOrder = await prisma.order.update({
       where: { id: req.params.id },
-      data: updateData
+      data: updateData,
+      include: {
+        user: { select: { name: true, email: true } },
+        shippingAddress: true,
+        orderItems: {
+           include: { product: { include: { images: true } } }
+        }
+      }
     });
 
     // RAZORPAY AUTOMATIC REFUND IMPLEMENTATION
@@ -326,7 +334,18 @@ const updateOrderStatus = async (req, res) => {
         }
     }
 
-    res.json({ ...updatedOrder, _id: updatedOrder.id });
+    const formattedOrder = {
+       ...updatedOrder,
+       _id: updatedOrder.id,
+       userId: updatedOrder.user,
+       orderItems: updatedOrder.orderItems.map(item => ({
+           ...item,
+           name: item.product?.name || 'Unknown Product',
+           image: item.product?.images?.side || ''
+       }))
+    };
+
+    res.json(formattedOrder);
   } catch(error) {
      res.status(500).json({ message: error.message });
   }
