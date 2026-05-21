@@ -49,9 +49,15 @@ const OrderListPage = () => {
         // 2. Status Filter
         if (statusFilter !== 'All') {
             if (statusFilter === 'Completed') {
-                tempOrders = tempOrders.filter(order => order.status === 'Delivered');
+                tempOrders = tempOrders.filter(order => order.status === 'DELIVERED');
+            } else if (statusFilter === 'Processing') {
+                tempOrders = tempOrders.filter(order => order.status === 'PROCESSING');
+            } else if (statusFilter === 'Shipped') {
+                tempOrders = tempOrders.filter(order => order.status === 'SHIPPED');
+            } else if (statusFilter === 'Cancelled') {
+                tempOrders = tempOrders.filter(order => order.status === 'CANCELLED');
             } else {
-                tempOrders = tempOrders.filter(order => order.status === statusFilter);
+                tempOrders = tempOrders.filter(order => order.status === statusFilter.toUpperCase());
             }
         }
 
@@ -219,9 +225,10 @@ const OrderListPage = () => {
                                     </td>
                                     <td className="p-4">
                                         <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${
-                                            order.status === 'Delivered' ? 'bg-blue-100 text-blue-700' :
-                                            order.status === 'Cancelled' ? 'bg-gray-200 text-gray-600' :
-                                            'bg-yellow-100 text-yellow-700'
+                                            order.status === 'DELIVERED' ? 'bg-green-100 text-green-700' :
+                                            order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-700' :
+                                            order.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
+                                            'bg-orange-100 text-orange-700'
                                         }`}>
                                             {order.status}
                                         </span>

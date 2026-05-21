@@ -63,7 +63,7 @@ const getProductById = async (req, res) => {
 // @route   POST /api/products
 const createProduct = async (req, res) => {
   try {
-    const { name, description, price, sizes, category, images, isFeatured } = req.body;
+    const { name, description, price, sizes, category, images, isFeatured, brand, color, material } = req.body;
 
     const createdProduct = await prisma.product.create({
       data: {
@@ -72,6 +72,9 @@ const createProduct = async (req, res) => {
         price,
         category,
         isFeatured,
+        brand,
+        color,
+        material,
         images: {
           create: {
             front: images?.front || '',
@@ -111,7 +114,7 @@ const createProduct = async (req, res) => {
 // @route   PUT /api/products/:id
 const updateProduct = async (req, res) => {
   try {
-    const { name, price, description, images, category, sizes } = req.body;
+    const { name, price, description, images, category, sizes, brand, color, material } = req.body;
 
     const product = await prisma.product.findUnique({ where: { id: req.params.id } });
 
@@ -123,6 +126,9 @@ const updateProduct = async (req, res) => {
           ...(price !== undefined && { price }),
           ...(description && { description }),
           ...(category && { category }),
+          ...(brand !== undefined && { brand }),
+          ...(color !== undefined && { color }),
+          ...(material !== undefined && { material }),
           ...(images && {
              images: {
                upsert: {

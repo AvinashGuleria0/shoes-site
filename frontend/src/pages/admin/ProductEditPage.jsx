@@ -13,6 +13,9 @@ const ProductEditPage = () => {
     const [price, setPrice] = useState(0);
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
+    const [brand, setBrand] = useState('');
+    const [color, setColor] = useState('');
+    const [material, setMaterial] = useState('');
     const [sizes, setSizes] = useState([{ size: '', quantity: 0 }]);
     
     // Image Angles
@@ -33,6 +36,9 @@ const ProductEditPage = () => {
                 setPrice(data.price);
                 setDescription(data.description);
                 setCategory(data.category);
+                setBrand(data.brand || '');
+                setColor(data.color || '');
+                setMaterial(data.material || '');
                 setSizes(data.sizes && data.sizes.length > 0 ? data.sizes : [{ size: '', quantity: 0 }]);
                 if (data.images) {
                     setImageFront(data.images.front || '');
@@ -128,6 +134,9 @@ const ProductEditPage = () => {
                     price,
                     description,
                     category,
+                    brand,
+                    color,
+                    material,
                     sizes: validSizes,
                     images: { front: imageFront, side: imageSide, back: imageBack }
                 },
@@ -232,6 +241,39 @@ const ProductEditPage = () => {
                                 onChange={(e) => setCategory(e.target.value)}
                                 className="w-full p-3 rounded-lg bg-gray-50 dark:bg-black border border-gray-200 dark:border-zinc-800 focus:ring-2 ring-black dark:ring-white outline-none"
                             />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div>
+                                <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Brand</label>
+                                <input
+                                    type="text"
+                                    value={brand}
+                                    onChange={(e) => setBrand(e.target.value)}
+                                    placeholder="e.g. Nike, Adidas"
+                                    className="w-full p-3 rounded-lg bg-gray-50 dark:bg-black border border-gray-200 dark:border-zinc-800 focus:ring-2 ring-black dark:ring-white outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Color</label>
+                                <input
+                                    type="text"
+                                    value={color}
+                                    onChange={(e) => setColor(e.target.value)}
+                                    placeholder="e.g. Black, Red"
+                                    className="w-full p-3 rounded-lg bg-gray-50 dark:bg-black border border-gray-200 dark:border-zinc-800 focus:ring-2 ring-black dark:ring-white outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Material</label>
+                                <input
+                                    type="text"
+                                    value={material}
+                                    onChange={(e) => setMaterial(e.target.value)}
+                                    placeholder="e.g. Leather, Suede"
+                                    className="w-full p-3 rounded-lg bg-gray-50 dark:bg-black border border-gray-200 dark:border-zinc-800 focus:ring-2 ring-black dark:ring-white outline-none"
+                                />
+                            </div>
                         </div>
 
                         <div className="mb-6">

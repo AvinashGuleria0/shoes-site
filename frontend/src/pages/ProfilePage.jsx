@@ -179,7 +179,10 @@ const ProfilePage = () => {
                                                     {order.isPaid ? 'Paid' : 'Unpaid'}
                                                 </span>
                                                 <span className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase ${
-                                                    order.status === 'Delivered' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'
+                                                    order.status === 'DELIVERED' ? 'bg-green-100 text-green-700' :
+                                                    order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-700' :
+                                                    order.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
+                                                    'bg-orange-100 text-orange-700'
                                                 }`}>
                                                     {order.status}
                                                 </span>

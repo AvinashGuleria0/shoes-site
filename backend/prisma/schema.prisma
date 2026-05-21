@@ -59,6 +59,9 @@ model Product {
   price       Float
   category    String
   isFeatured  Boolean        @default(false)
+  brand       String?
+  color       String?
+  material    String?
   sizes       ProductSize[]
   images      ProductImage?
   orderItems  OrderItem[]

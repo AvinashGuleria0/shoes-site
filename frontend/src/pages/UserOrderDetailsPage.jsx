@@ -53,13 +53,15 @@ const UserOrderDetailsPage = () => {
                         </div>
                         <div className="flex flex-col items-end gap-2 mt-4 md:mt-0">
                              <div className={`px-4 py-2 rounded-full font-black uppercase text-xs tracking-widest flex items-center gap-2 ${
-                                order.status === 'Delivered' ? 'bg-blue-100 text-blue-700' :
-                                order.status === 'Cancelled' ? 'bg-gray-100 text-gray-600' :
-                                'bg-yellow-100 text-yellow-700'
+                                order.status === 'DELIVERED' ? 'bg-green-100 text-green-700' :
+                                order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-700' :
+                                order.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
+                                'bg-orange-100 text-orange-700'
                             }`}>
-                                {order.status === 'Delivered' && <FaCheckCircle />}
-                                {order.status === 'Cancelled' && <FaTimesCircle />}
-                                {order.status === 'Processing' && <FaTruck />}
+                                {order.status === 'DELIVERED' && <FaCheckCircle />}
+                                {order.status === 'SHIPPED' && <FaTruck />}
+                                {order.status === 'CANCELLED' && <FaTimesCircle />}
+                                {order.status === 'PROCESSING' && <FaBox className="animate-pulse" />}
                                 {order.status}
                             </div>
                             <div className={`px-4 py-2 rounded-full font-black uppercase text-xs tracking-widest flex items-center gap-2 ${

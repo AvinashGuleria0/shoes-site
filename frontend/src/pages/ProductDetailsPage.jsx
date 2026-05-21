@@ -220,6 +220,36 @@ const ProductDetailsPage = () => {
               {product.description}
             </p>
 
+            {/* Product Specs Grid */}
+            {(product.brand || product.color || product.material || product.category) && (
+              <div className="mb-6 sm:mb-8 grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-gray-50 dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800">
+                {product.brand && (
+                  <div className="p-2">
+                    <span className="text-[10px] sm:text-xs text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider block">Brand</span>
+                    <span className="text-xs sm:text-sm font-black uppercase text-black dark:text-white mt-1 block truncate">{product.brand}</span>
+                  </div>
+                )}
+                {product.color && (
+                  <div className="p-2">
+                    <span className="text-[10px] sm:text-xs text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider block">Color</span>
+                    <span className="text-xs sm:text-sm font-black capitalize text-black dark:text-white mt-1 block truncate">{product.color}</span>
+                  </div>
+                )}
+                {product.material && (
+                  <div className="p-2">
+                    <span className="text-[10px] sm:text-xs text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider block">Material</span>
+                    <span className="text-xs sm:text-sm font-black capitalize text-black dark:text-white mt-1 block truncate">{product.material}</span>
+                  </div>
+                )}
+                {product.category && (
+                  <div className="p-2">
+                    <span className="text-[10px] sm:text-xs text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-wider block">Category</span>
+                    <span className="text-xs sm:text-sm font-black capitalize text-black dark:text-white mt-1 block truncate">{product.category}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Size Selector */}
             <div className="mb-6 sm:mb-8">
               <div className="flex justify-between items-center mb-2 sm:mb-3">

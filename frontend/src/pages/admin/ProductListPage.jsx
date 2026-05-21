@@ -70,6 +70,9 @@ const ProductListPage = () => {
                          price: 0,
                          description: 'Sample Description',
                          category: 'Sample Category',
+                         brand: 'Sample Brand',
+                         color: 'Sample Color',
+                         material: 'Sample Material',
                          images: {
                              front: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
                              side: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',

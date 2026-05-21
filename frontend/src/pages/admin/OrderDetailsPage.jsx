@@ -20,7 +20,7 @@ const OrderDetailsPage = () => {
 
     const updateStatusHandler = async (status) => {
         // If marking as delivered and order is unpaid, show payment modal first
-        if (status === 'Delivered' && !order.isPaid) {
+        if (status === 'DELIVERED' && !order.isPaid) {
             setShowPaymentModal(true);
             return;
         }
@@ -29,7 +29,7 @@ const OrderDetailsPage = () => {
         try {
             const { data } = await axios.put(
                 `${import.meta.env.VITE_API_URL}/api/orders/${orderId}/status`,
-                { status, cancellationNote: status === 'Cancelled' ? cancellationNote : undefined },
+                { status, cancellationNote: status === 'CANCELLED' ? cancellationNote : undefined },
                 { headers: { Authorization: `Bearer ${userInfo.token}` } }
             );
             setOrder(data);
@@ -60,7 +60,7 @@ const OrderDetailsPage = () => {
             // Then update status to delivered
             const { data: deliveredOrder } = await axios.put(
                 `${import.meta.env.VITE_API_URL}/api/orders/${orderId}/status`,
-                { status: 'Delivered' },
+                { status: 'DELIVERED' },
                 { headers: { Authorization: `Bearer ${userInfo.token}` } }
             );
 
@@ -188,17 +188,17 @@ const OrderDetailsPage = () => {
                     <p className="text-4xl font-black italic tracking-tighter">₹{order.totalPrice.toLocaleString()}</p>
                 </div>
                 <div className="flex flex-wrap justify-center gap-3">
-                     {order.status !== 'Delivered' && order.status !== 'Cancelled' && (
+                     {order.status !== 'DELIVERED' && order.status !== 'CANCELLED' && (
                         <>
                             <button 
-                                onClick={() => updateStatusHandler('Shipped')}
-                                disabled={statusLoading || order.status === 'Shipped'}
+                                onClick={() => updateStatusHandler('SHIPPED')}
+                                disabled={statusLoading || order.status === 'SHIPPED'}
                                 className="flex items-center gap-2 bg-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition-colors disabled:opacity-50"
                             >
                                 <FaTruck /> Mark Shipped
                             </button>
                             <button 
-                                onClick={() => updateStatusHandler('Delivered')}
+                                onClick={() => updateStatusHandler('DELIVERED')}
                                 disabled={statusLoading}
                                 className="flex items-center gap-2 bg-green-600 px-4 py-2 rounded-lg font-bold hover:bg-green-700 transition-colors disabled:opacity-50"
                             >
@@ -213,8 +213,8 @@ const OrderDetailsPage = () => {
                             </button>
                         </>
                      )}
-                     {(order.status === 'Delivered' || order.status === 'Cancelled') && (
-                        <div className="text-sm font-bold opacity-60 uppercase tracking-widest">
+                     {(order.status === 'DELIVERED' || order.status === 'CANCELLED') && (
+                        <div className="text-sm font-bold opacity-60 uppercase tracking-widest text-green-500 dark:text-green-400">
                             Order is {order.status}
                         </div>
                      )}
@@ -248,7 +248,7 @@ const OrderDetailsPage = () => {
                                 Back
                             </button>
                             <button 
-                                onClick={() => updateStatusHandler('Cancelled')}
+                                onClick={() => updateStatusHandler('CANCELLED')}
                                 disabled={!cancellationNote || statusLoading}
                                 className="flex-1 py-3 font-bold bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50"
                             >
