@@ -206,10 +206,29 @@ const updateOrderToPaid = async (req, res) => {
 const getMyOrders = async (req, res) => {
   const orders = await prisma.order.findMany({ 
     where: { userId: req.user.id },
+    include: {
+      orderItems: {
+        include: {
+          product: {
+            include: {
+              images: true
+            }
+          }
+        }
+      }
+    },
     orderBy: { createdAt: 'desc' }
   });
   
-  res.json(orders.map(o => ({ ...o, _id: o.id })));
+  res.json(orders.map(o => ({
+    ...o,
+    _id: o.id,
+    orderItems: o.orderItems.map(item => ({
+      ...item,
+      name: item.product?.name || 'Unknown Product',
+      image: item.product?.images?.side || ''
+    }))
+  })));
 };
 
 // @desc    Get all orders (Admin)
