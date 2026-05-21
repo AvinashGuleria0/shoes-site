@@ -279,7 +279,8 @@ const getOrderById = async (req, res) => {
 // @desc    Update order status
 // @route   PUT /api/orders/:id/status
 const updateOrderStatus = async (req, res) => {
-  const { status, cancellationNote } = req.body;
+  const { status: rawStatus, cancellationNote } = req.body;
+  const status = rawStatus?.toUpperCase();
   
   try {
     const order = await prisma.order.findUnique({ where: { id: req.params.id } });
