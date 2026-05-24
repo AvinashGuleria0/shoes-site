@@ -194,8 +194,8 @@ body {
 
 /* Mobile-first touch improvements */
 @media (max-width: 640px) {
-  /* Improve touch targets */
-  button, a {
+  /* Improve touch targets for custom touch elements */
+  .touch-target {
     min-height: 44px;
     min-width: 44px;
   }
