@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { FaArrowLeft, FaMagic, FaSave, FaImage, FaUpload } from 'react-icons/fa';
+import { FaArrowLeft, FaMagic, FaSave, FaImage, FaUpload, FaSpinner } from 'react-icons/fa';
 
 const ProductEditPage = () => {
     const { id: productId } = useParams();
@@ -25,6 +25,7 @@ const ProductEditPage = () => {
     
     const [uploading, setUploading] = useState(false);
     const [removingBg, setRemovingBg] = useState(false);
+    const [loadingField, setLoadingField] = useState(null);
 
     const { userInfo } = useSelector((state) => state.auth);
 
@@ -67,11 +68,14 @@ const ProductEditPage = () => {
         setSizes(newSizes);
     };
 
-    const uploadFileHandler = async (e, setImageFunction, removeBg = false) => {
+    const uploadFileHandler = async (e, setImageFunction, fieldId, removeBg = false) => {
       const file = e.target.files[0];
+      if (!file) return;
+
       const formData = new FormData();
       formData.append('image', file);
       
+      setLoadingField(fieldId);
       if (removeBg) {
           setRemovingBg(true);
       } else {
@@ -94,21 +98,19 @@ const ProductEditPage = () => {
         
         if (removeBg) {
             toast.success('Background Removed & Image Uploaded!');
-            setRemovingBg(false);
-        } else {
-            setUploading(false);
         }
-
       } catch (error) {
         console.error(error);
         const errMsg = error.response?.data?.message || error.message;
         if (removeBg) {
             toast.error(`Background removal failed: ${errMsg}`);
-            setRemovingBg(false);
         } else {
             toast.error(`Image upload failed: ${errMsg}`);
-            setUploading(false);
         }
+      } finally {
+        setLoadingField(null);
+        setUploading(false);
+        setRemovingBg(false);
       }
     };
 
@@ -172,15 +174,20 @@ const ProductEditPage = () => {
                         <p className="text-xs text-gray-400 mb-6">Upload 3 angles for the 3D scroll effect. Use "Remove BG" for transparent PNGs.</p>
                         
                         {[
-                            { label: 'Side Angle (Main)', val: imageSide, set: setImageSide },
-                            { label: 'Front Angle', val: imageFront, set: setImageFront },
-                            { label: 'Back Angle', val: imageBack, set: setImageBack }
+                            { id: 'side', label: 'Side Angle (Main)', val: imageSide, set: setImageSide },
+                            { id: 'front', label: 'Front Angle', val: imageFront, set: setImageFront },
+                            { id: 'back', label: 'Back Angle', val: imageBack, set: setImageBack }
                         ].map((field, idx) => (
                             <div key={idx} className="mb-6 p-4 bg-gray-50 dark:bg-black rounded-xl border border-gray-200 dark:border-zinc-800">
                                 <label className="block text-xs font-bold uppercase mb-2 text-gray-500">{field.label}</label>
                                 
                                 <div className="flex items-center gap-2 mb-3">
-                                    <div className="w-16 h-16 bg-white dark:bg-zinc-900 rounded-lg flex items-center justify-center overflow-hidden border">
+                                    <div className="w-16 h-16 bg-white dark:bg-zinc-900 rounded-lg flex items-center justify-center overflow-hidden border relative">
+                                        {loadingField === field.id && (
+                                            <div className="absolute inset-0 bg-white/80 dark:bg-black/80 flex items-center justify-center z-10">
+                                                <FaSpinner className="animate-spin text-blue-600 text-lg" />
+                                            </div>
+                                        )}
                                         {field.val ? (
                                             <img src={field.val.startsWith('http') ? field.val : `${import.meta.env.VITE_API_URL}${field.val}`} className="w-full h-full object-contain" alt="" />
                                         ) : (
@@ -192,18 +199,19 @@ const ProductEditPage = () => {
                                         value={field.val} 
                                         onChange={(e) => field.set(e.target.value)}
                                         placeholder="Image URL"
-                                        className="flex-1 bg-transparent border-b border-gray-300 dark:border-zinc-700 text-sm focus:border-black dark:focus:border-white outline-none p-1"
+                                        disabled={loadingField !== null}
+                                        className="flex-1 bg-transparent border-b border-gray-300 dark:border-zinc-700 text-sm focus:border-black dark:focus:border-white outline-none p-1 disabled:opacity-50"
                                     />
                                 </div>
 
                                 <div className="flex gap-2">
-                                    <label className="flex-1 cursor-pointer bg-black text-white dark:bg-white dark:text-black py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 hover:opacity-80 transition-opacity">
+                                    <label className={`flex-1 cursor-pointer bg-black text-white dark:bg-white dark:text-black py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 hover:opacity-80 transition-opacity ${loadingField !== null ? 'opacity-50 pointer-events-none' : ''}`}>
                                         <FaUpload /> Upload
-                                        <input type="file" className="hidden" onChange={(e) => uploadFileHandler(e, field.set, false)} />
+                                        <input type="file" className="hidden" onChange={(e) => uploadFileHandler(e, field.set, field.id, false)} disabled={loadingField !== null} />
                                     </label>
-                                    <label className="flex-1 cursor-pointer bg-purple-600 text-white py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 hover:bg-purple-700 transition-colors">
+                                    <label className={`flex-1 cursor-pointer bg-purple-600 text-white py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 hover:bg-purple-700 transition-colors ${loadingField !== null ? 'opacity-50 pointer-events-none' : ''}`}>
                                         <FaMagic /> Remove BG
-                                        <input type="file" className="hidden" onChange={(e) => uploadFileHandler(e, field.set, true)} disabled={removingBg} />
+                                        <input type="file" className="hidden" onChange={(e) => uploadFileHandler(e, field.set, field.id, true)} disabled={loadingField !== null} />
                                     </label>
                                 </div>
                             </div>
@@ -328,7 +336,8 @@ const ProductEditPage = () => {
 
                         <button
                             type="submit"
-                            className="w-full py-4 bg-blue-600 text-white font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform active:scale-95 transition-all"
+                            disabled={loadingField !== null}
+                            className={`w-full py-4 bg-blue-600 text-white font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform active:scale-95 transition-all ${loadingField !== null ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <FaSave /> Save Changes
                         </button>
