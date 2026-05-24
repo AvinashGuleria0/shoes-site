@@ -32,7 +32,7 @@ https://github.com/user-attachments/assets/2c54d4e3-ad34-4a60-933c-cd46ff15d7b6
 ### Backend Architecture
 *   **Runtime Environment:** Node.js
 *   **Web Framework:** Express.js
-*   **Database & ORM:** MongoDB with Mongoose, Prisma ORM
+*   **Database & ORM:** PostgreSQL with Prisma ORM (Neon DB)
 *   **Caching & State:** Upstash Redis
 *   **Authentication & Security:** bcryptjs, JSON Web Token, Passport.js, Express Rate Limit
 *   **Real-Time Engine:** Socket.IO
@@ -47,13 +47,13 @@ The application adopts a decoupled architecture separating the client-side prese
 
 *   **Client:** A single-page application focused on high performance and complex UI interactions, managing global state for carts and user sessions.
 *   **Server:** A RESTful API layer handling data persistence, external service integrations (payments, cloud storage), and broadcasting real-time events.
-*   **Data Layer:** Hybrid approach utilizing document-based storage for flexible product catalogs and relationship-based modeling where strict data integrity is required.
+*   **Data Layer:** Relational data mapping with PostgreSQL (Neon Serverless Postgres) and Prisma ORM for type-safe data access and integrity.
 
 ## Local Development Setup
 
 ### Prerequisites
 *   Node.js installed on your local machine
-*   MongoDB database cluster URI
+*   PostgreSQL database connection URI (Neon DB or local instance)
 *   Cloudinary account credentials
 *   Razorpay API keys
 *   Google Cloud Console project configured for OAuth credentials
@@ -76,7 +76,7 @@ The application adopts a decoupled architecture separating the client-side prese
     Create a `.env` file in the root of the `backend` directory based on `.env.example` and populate it with your specific service keys:
     ```env
     PORT=5000
-    MONGO_URI=your_mongodb_uri
+    NEON_DB=your_postgresql_neon_connection_string
     JWT_SECRET=your_jwt_secret
     CLOUDINARY_CLOUD_NAME=your_cloud_name
     CLOUDINARY_API_KEY=your_api_key
