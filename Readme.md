@@ -4,7 +4,7 @@ A production-ready, full-stack e-commerce application tailored for footwear. Kic
 
 **Live Demo:** [https://kicks-shoestore.vercel.app/](https://kicks-shoestore.vercel.app/)
 
-https://github.com/user-attachments/assets/e76f89db-82f1-4ee3-95bf-7f1c7ff7bb26
+https://github.com/user-attachments/assets/2c54d4e3-ad34-4a60-933c-cd46ff15d7b6
 
 ## Core Features
 
@@ -38,7 +38,7 @@ https://github.com/user-attachments/assets/e76f89db-82f1-4ee3-95bf-7f1c7ff7bb26
 *   **Real-Time Engine:** Socket.IO
 *   **Payment Processing:** Razorpay
 *   **File Handling & Storage:** Multer, Cloudinary
-*   **Email Services:** Nodemailer, Resend
+*   **Email Services:** Nodemailer, Brevo
 *   **External APIs:** Google Auth Library
 
 ## System Architecture
