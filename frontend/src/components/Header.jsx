@@ -59,8 +59,9 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed w-full z-50 transition-all duration-300 bg-white/70 backdrop-blur-xl border-b border-gray-200/50 text-gray-800 dark:text-white dark:bg-black/70 dark:border-white/10 shadow-sm">
-      <nav className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+    <>
+      <header className="fixed w-full z-50 transition-all duration-300 bg-white/70 backdrop-blur-xl border-b border-gray-200/50 text-gray-800 dark:text-white dark:bg-black/70 dark:border-white/10 shadow-sm">
+        <nav className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
         {/* LOGO */}
         <Link to="/" className="flex items-center gap-2 relative z-10" title="Kicks Store">
           <img src={logo} alt="Kicks" className="h-10 sm:h-12 w-auto object-contain" />
@@ -111,7 +112,7 @@ const Header = () => {
             {theme === 'dark' ? <FaSun className="text-xl" /> : <FaMoon className="text-xl" />}
           </button>
           
-          <Link to="/wishlist" className="relative hover:text-red-500 transition-colors hidden sm:block">
+          <Link to="/wishlist" className="relative hover:text-red-500 transition-colors block">
              <FaHeart className="text-xl" />
              {wishlistItems && wishlistItems.length > 0 && (
                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
@@ -166,128 +167,129 @@ const Header = () => {
           </button>
         </div>
       </nav>
+    </header>
 
-      {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 top-[56px] sm:top-[64px] bg-white dark:bg-zinc-950 z-40 overflow-y-auto">
-          <div className="container mx-auto px-6 py-8">
-            {/* Mobile Search */}
-            <form onSubmit={searchHandler} className="mb-8">
-              <div className="flex items-center bg-gray-100 dark:bg-zinc-800 rounded-xl overflow-hidden">
-                <input 
-                  type="text" 
-                  placeholder="Search products..." 
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  className="flex-1 bg-transparent px-4 py-3 outline-none"
-                />
-                <button type="submit" className="px-4 py-3 text-gray-500 hover:text-black dark:hover:text-white">
-                  <FaSearch />
-                </button>
-              </div>
-            </form>
-
-            {/* Mobile Nav Links */}
-            <nav className="space-y-4 mb-8">
-              <Link 
-                to="/" 
-                onClick={closeMobileMenu}
-                className="block text-2xl font-black uppercase tracking-tight py-3 border-b border-gray-100 dark:border-zinc-800 hover:text-red-500 transition-colors"
-              >
-                Home
-              </Link>
-              <Link 
-                to="/shop" 
-                onClick={closeMobileMenu}
-                className="block text-2xl font-black uppercase tracking-tight py-3 border-b border-gray-100 dark:border-zinc-800 hover:text-red-500 transition-colors"
-              >
-                Shop
-              </Link>
-              <Link 
-                to="/cart" 
-                onClick={closeMobileMenu}
-                className="block text-2xl font-black uppercase tracking-tight py-3 border-b border-gray-100 dark:border-zinc-800 hover:text-red-500 transition-colors"
-              >
-                Cart {cartItems.length > 0 && <span className="text-red-500">({cartItems.reduce((acc, item) => acc + item.qty, 0)})</span>}
-              </Link>
-              <Link 
-                to="/wishlist" 
-                onClick={closeMobileMenu}
-                className="block text-2xl font-black uppercase tracking-tight py-3 border-b border-gray-100 dark:border-zinc-800 hover:text-red-500 transition-colors"
-              >
-                Wishlist {wishlistItems && wishlistItems.length > 0 && <span className="text-red-500">({wishlistItems.length})</span>}
-              </Link>
-            </nav>
-
-            {/* User Section */}
-            <div className="space-y-4">
-              {userInfo ? (
-                <>
-                  <Link 
-                    to="/profile" 
-                    onClick={closeMobileMenu}
-                    className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-zinc-900 rounded-xl"
-                  >
-                    <div className="w-12 h-12 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center font-black text-lg">
-                      {userInfo.name ? userInfo.name.charAt(0).toUpperCase() : 'U'}
-                    </div>
-                    <div>
-                      <p className="font-bold">{userInfo.name}</p>
-                      <p className="text-sm text-gray-500">{userInfo.email}</p>
-                    </div>
-                  </Link>
-                  
-                  {(userInfo.role === 'admin' || userInfo.role === 'superadmin') && (
-                    <Link 
-                      to="/admin/dashboard" 
-                      onClick={closeMobileMenu}
-                      className="block w-full text-center py-3 bg-red-600 text-white rounded-xl font-bold uppercase tracking-wider"
-                    >
-                      Admin Dashboard
-                    </Link>
-                  )}
-                  
-                  <button 
-                    onClick={handleLogout}
-                    className="flex items-center justify-center gap-2 w-full py-3 border-2 border-gray-200 dark:border-zinc-700 rounded-xl font-bold uppercase tracking-wider hover:bg-red-600 hover:border-red-600 hover:text-white transition-all"
-                  >
-                    <FaSignOutAlt /> Sign Out
-                  </button>
-                </>
-              ) : (
-                <div className="flex gap-4">
-                  <Link 
-                    to="/login" 
-                    onClick={closeMobileMenu}
-                    className="flex-1 text-center py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-bold uppercase tracking-wider"
-                  >
-                    Login
-                  </Link>
-                  <Link 
-                    to="/register" 
-                    onClick={closeMobileMenu}
-                    className="flex-1 text-center py-3 border-2 border-black dark:border-white rounded-xl font-bold uppercase tracking-wider"
-                  >
-                    Register
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Theme Toggle */}
-            <div className="mt-8 pt-8 border-t border-gray-100 dark:border-zinc-800">
-              <button 
-                onClick={toggleTheme}
-                className="flex items-center justify-center gap-3 w-full py-3 bg-gray-100 dark:bg-zinc-800 rounded-xl font-bold"
-              >
-                {theme === 'dark' ? <FaSun /> : <FaMoon />}
-                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+    {/* Mobile Menu Overlay */}
+    {mobileMenuOpen && (
+      <div className="lg:hidden fixed inset-0 top-[64px] bg-white dark:bg-zinc-950 z-40 overflow-y-auto">
+        <div className="container mx-auto px-6 py-8">
+          {/* Mobile Search */}
+          <form onSubmit={searchHandler} className="mb-8">
+            <div className="flex items-center bg-gray-100 dark:bg-zinc-800 rounded-xl overflow-hidden">
+              <input 
+                type="text" 
+                placeholder="Search products..." 
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                className="flex-1 bg-transparent px-4 py-3 outline-none"
+              />
+              <button type="submit" className="px-4 py-3 text-gray-500 hover:text-black dark:hover:text-white">
+                <FaSearch />
               </button>
             </div>
+          </form>
+
+          {/* Mobile Nav Links */}
+          <nav className="space-y-4 mb-8">
+            <Link 
+              to="/" 
+              onClick={closeMobileMenu}
+              className="block text-2xl font-black uppercase tracking-tight py-3 border-b border-gray-100 dark:border-zinc-800 hover:text-red-500 transition-colors"
+            >
+              Home
+            </Link>
+            <Link 
+              to="/shop" 
+              onClick={closeMobileMenu}
+              className="block text-2xl font-black uppercase tracking-tight py-3 border-b border-gray-100 dark:border-zinc-800 hover:text-red-500 transition-colors"
+            >
+              Shop
+            </Link>
+            <Link 
+              to="/cart" 
+              onClick={closeMobileMenu}
+              className="block text-2xl font-black uppercase tracking-tight py-3 border-b border-gray-100 dark:border-zinc-800 hover:text-red-500 transition-colors"
+            >
+              Cart {cartItems.length > 0 && <span className="text-red-500">({cartItems.reduce((acc, item) => acc + item.qty, 0)})</span>}
+            </Link>
+            <Link 
+              to="/wishlist" 
+              onClick={closeMobileMenu}
+              className="block text-2xl font-black uppercase tracking-tight py-3 border-b border-gray-100 dark:border-zinc-800 hover:text-red-500 transition-colors"
+            >
+              Wishlist {wishlistItems && wishlistItems.length > 0 && <span className="text-red-500">({wishlistItems.length})</span>}
+            </Link>
+          </nav>
+
+          {/* User Section */}
+          <div className="space-y-4">
+            {userInfo ? (
+              <>
+                <Link 
+                  to="/profile" 
+                  onClick={closeMobileMenu}
+                  className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-zinc-900 rounded-xl"
+                >
+                  <div className="w-12 h-12 bg-black dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center font-black text-lg">
+                    {userInfo.name ? userInfo.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <div>
+                    <p className="font-bold">{userInfo.name}</p>
+                    <p className="text-sm text-gray-500">{userInfo.email}</p>
+                  </div>
+                </Link>
+                
+                {(userInfo.role === 'admin' || userInfo.role === 'superadmin') && (
+                  <Link 
+                    to="/admin/dashboard" 
+                    onClick={closeMobileMenu}
+                    className="block w-full text-center py-3 bg-red-600 text-white rounded-xl font-bold uppercase tracking-wider"
+                  >
+                    Admin Dashboard
+                  </Link>
+                )}
+                
+                <button 
+                  onClick={handleLogout}
+                  className="flex items-center justify-center gap-2 w-full py-3 border-2 border-gray-200 dark:border-zinc-700 rounded-xl font-bold uppercase tracking-wider hover:bg-red-600 hover:border-red-600 hover:text-white transition-all"
+                >
+                  <FaSignOutAlt /> Sign Out
+                </button>
+              </>
+            ) : (
+              <div className="flex gap-4">
+                <Link 
+                  to="/login" 
+                  onClick={closeMobileMenu}
+                  className="flex-1 text-center py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl font-bold uppercase tracking-wider"
+                >
+                  Login
+                </Link>
+                <Link 
+                  to="/register" 
+                  onClick={closeMobileMenu}
+                  className="flex-1 text-center py-3 border-2 border-black dark:border-white rounded-xl font-bold uppercase tracking-wider"
+                >
+                  Register
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Theme Toggle */}
+          <div className="mt-8 pt-8 border-t border-gray-100 dark:border-zinc-800">
+            <button 
+              onClick={toggleTheme}
+              className="flex items-center justify-center gap-3 w-full py-3 bg-gray-100 dark:bg-zinc-800 rounded-xl font-bold"
+            >
+              {theme === 'dark' ? <FaSun /> : <FaMoon />}
+              {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            </button>
           </div>
         </div>
-      )}
-    </header>
+      </div>
+    )}
+  </>
   );
 };
 
