@@ -1,88 +1,112 @@
-# Kicks E-Commerce Store
+# Kicks E-Commerce Platform
 
-A full-stack e-commerce web application specializing in footwear. Built with the MERN stack (MongoDB, Express, React, Node.js), this platform offers a seamless shopping experience with secure authentication, real-time features, and integrated payment processing. 
+A production-ready, full-stack e-commerce application tailored for footwear. Kicks bridges the gap between high-end, creative user interfaces and robust, scalable backend architecture. The platform features an immersive scrollytelling experience, secure authentication, real-time order tracking, and a comprehensive administrative dashboard.
 
 **Live Demo:** [https://kicks-shoestore.vercel.app/](https://kicks-shoestore.vercel.app/)
 
-
 https://github.com/user-attachments/assets/e76f89db-82f1-4ee3-95bf-7f1c7ff7bb26
 
+## Core Features
 
-
-## Features
-
-*   **User Authentication:** Secure login and registration using JWT and Google OAuth (Passport.js).
-*   **Product Management:** Browse products, view detailed specifications, and search/filter inventory.
-*   **Shopping Cart & Wishlist:** Persistent cart and wishlist functionality managed via Redux Toolkit.
-*   **Checkout & Payments:** Secure payment gateway integration using Razorpay.
-*   **Real-Time Updates:** order status and live notifications powered by Socket.IO.
-*   **Admin Dashboard:** Dedicated admin interfaces to manage products, view order logs, and manage other administrators.
-*   **Image Management:** Cloudinary integration for smooth product image uploads and hosting.
-*   **Responsive UI:** Fully responsive and animated user interface built with Tailwind CSS and GSAP.
+*   **Immersive User Experience:** Utilizes advanced animation libraries for a sticky, scrollytelling home page that presents products dynamically without relying on 3D models.
+*   **Comprehensive Authentication:** Secure user access managed through JSON Web Tokens, Google OAuth, and customized role-based access control (User, Admin, Superadmin).
+*   **Real-Time Capabilities:** Live order tracking and instant administrative notifications powered by WebSocket connections.
+*   **Advanced Product Management:** Multi-angle product imagery supported by cloud storage, alongside inventory and category management.
+*   **Seamless Checkout:** Integrated payment gateway for secure and reliable transaction processing.
+*   **Administrative Management:** Dedicated superadmin capabilities for managing administrators, overseeing comprehensive audit logs, and monitoring sales analytics.
+*   **Theming Options:** Full support for both dark and light modes, enhancing accessibility and user preference.
 
 ## Technology Stack
 
-### Frontend
-*   **Framework:** React 19, Vite
-*   **State Management:** Redux Toolkit
-*   **Styling:** Tailwind CSS v4, PostCSS
-*   **Animations:** GSAP, Tailwind Animate
-*   **Routing:** React Router v7
-*   **Network:** Axios, Socket.IO Client
+### Frontend Architecture
+*   **Core Library:** React
+*   **Build Tool:** Vite
+*   **State Management:** Redux Toolkit, React Redux
+*   **Routing:** React Router DOM
+*   **Styling:** Tailwind CSS, PostCSS, Tailwind Animate
+*   **Animations:** GSAP (GreenSock Animation Platform)
+*   **Network & Communication:** Axios, Socket.IO Client
+*   **Authentication Integration:** React OAuth Google
+*   **UI Components & Feedback:** React Toastify, React Icons
 
-### Backend
-*   **Runtime:** Node.js
-*   **Framework:** Express.js
-*   **Database:** MongoDB with Mongoose
-*   **Authentication:** bcryptjs, jsonwebtoken, Passport-Google-OAuth20
-*   **Uploads:** Multer, Cloudinary
-*   **Payments:** Razorpay
-*   **Real-time:** Socket.IO
+### Backend Architecture
+*   **Runtime Environment:** Node.js
+*   **Web Framework:** Express.js
+*   **Database & ORM:** MongoDB with Mongoose, Prisma ORM
+*   **Caching & State:** Upstash Redis
+*   **Authentication & Security:** bcryptjs, JSON Web Token, Passport.js, Express Rate Limit
+*   **Real-Time Engine:** Socket.IO
+*   **Payment Processing:** Razorpay
+*   **File Handling & Storage:** Multer, Cloudinary
+*   **Email Services:** Nodemailer, Resend
+*   **External APIs:** Google Auth Library
 
-## Local Installation
+## System Architecture
+
+The application adopts a decoupled architecture separating the client-side presentation from the server-side business logic.
+
+*   **Client:** A single-page application focused on high performance and complex UI interactions, managing global state for carts and user sessions.
+*   **Server:** A RESTful API layer handling data persistence, external service integrations (payments, cloud storage), and broadcasting real-time events.
+*   **Data Layer:** Hybrid approach utilizing document-based storage for flexible product catalogs and relationship-based modeling where strict data integrity is required.
+
+## Local Development Setup
 
 ### Prerequisites
-*   Node.js (v18 or higher recommended)
-*   MongoDB URI
-*   Cloudinary Account
-*   Razorpay Account
-*   Google Cloud Project (for OAuth)
+*   Node.js installed on your local machine
+*   MongoDB database cluster URI
+*   Cloudinary account credentials
+*   Razorpay API keys
+*   Google Cloud Console project configured for OAuth credentials
 
-### Setup Steps
+### Installation Instructions
 
-1.  **Clone the repository**
+1.  **Clone the Repository**
+    ```bash
+    git clone <repository-url>
+    cd <repository-directory>
+    ```
 
-2.  **Backend Setup**
-    *   Navigate to the backend directory:
-        \ash
-        cd backend
-         npm install
-        \\n    *   Create a .env file in the ackend directory and configure your environment variables:
-        \env
-        PORT=5000
-        MONGO_URI=your_mongodb_uri
-        JWT_SECRET=your_jwt_secret
-        CLOUDINARY_CLOUD_NAME=your_cloud_name
-        CLOUDINARY_API_KEY=your_api_key
-        CLOUDINARY_API_SECRET=your_api_secret
-        RAZORPAY_KEY_ID=your_razorpay_key
-        RAZORPAY_KEY_SECRET=your_razorpay_secret
-        GOOGLE_CLIENT_ID=your_google_id
-        GOOGLE_CLIENT_SECRET=your_google_secret
-        \\n    *   Start the backend development server:
-        \ash
-         npm run dev
-        \\n
-3.  **Frontend Setup**
-    *   Navigate to the frontend directory:
-        \ash
-        cd frontend
-         npm install
-        \\n    *   Create a .env file in the rontend directory (if required) for API URLs or Google OAuth client IDs.
-    *   Start the frontend development server:
-        \ash
-         npm run dev
-        \\n
-## Deployment
-*   The frontend is configured for deployment on Vercel (includes ercel.json).
-*   The backend can be deployed to services like Render, Heroku, or DigitalOcean.
+2.  **Backend Configuration**
+    Navigate to the backend directory and install the necessary dependencies:
+    ```bash
+    cd backend
+    npm install
+    ```
+    
+    Create a `.env` file in the root of the `backend` directory based on `.env.example` and populate it with your specific service keys:
+    ```env
+    PORT=5000
+    MONGO_URI=your_mongodb_uri
+    JWT_SECRET=your_jwt_secret
+    CLOUDINARY_CLOUD_NAME=your_cloud_name
+    CLOUDINARY_API_KEY=your_api_key
+    CLOUDINARY_API_SECRET=your_api_secret
+    RAZORPAY_KEY_ID=your_razorpay_key
+    RAZORPAY_KEY_SECRET=your_razorpay_secret
+    GOOGLE_CLIENT_ID=your_google_client_id
+    GOOGLE_CLIENT_SECRET=your_google_client_secret
+    ```
+    
+    Start the backend development server:
+    ```bash
+    npm run dev
+    ```
+
+3.  **Frontend Configuration**
+    Open a new terminal window, navigate to the frontend directory, and install dependencies:
+    ```bash
+    cd frontend
+    npm install
+    ```
+    
+    Create a `.env` file in the root of the `frontend` directory for environment-specific variables like API endpoints and Client IDs.
+    
+    Start the frontend development server:
+    ```bash
+    npm run dev
+    ```
+
+## Deployment Strategy
+
+*   **Frontend Environment:** Configured and optimized for serverless deployment on platforms like Vercel (configuration included via `vercel.json`).
+*   **Backend Environment:** Capable of being containerized or hosted directly on PaaS providers such as Render, Heroku, or DigitalOcean App Platform.

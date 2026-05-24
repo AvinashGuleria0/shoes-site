@@ -69,7 +69,7 @@ const createProduct = async (req, res) => {
       data: {
         name,
         description,
-        price,
+        price: price !== undefined && price !== '' ? parseFloat(price) : 0,
         category,
         isFeatured,
         brand,
@@ -86,7 +86,7 @@ const createProduct = async (req, res) => {
         sizes: {
           create: sizes?.map(s => ({
             size: s.size,
-            quantity: s.quantity
+            quantity: s.quantity !== undefined && s.quantity !== '' ? parseInt(s.quantity, 10) : 0
           })) || []
         }
       },
@@ -123,7 +123,7 @@ const updateProduct = async (req, res) => {
         where: { id: req.params.id },
         data: {
           ...(name && { name }),
-          ...(price !== undefined && { price }),
+          ...(price !== undefined && price !== '' && { price: parseFloat(price) }),
           ...(description && { description }),
           ...(category && { category }),
           ...(brand !== undefined && { brand }),
@@ -144,7 +144,11 @@ const updateProduct = async (req, res) => {
       if (sizes) {
          await prisma.productSize.deleteMany({ where: { productId: product.id } });
          await prisma.productSize.createMany({
-            data: sizes.map(s => ({ productId: product.id, size: s.size, quantity: s.quantity }))
+            data: sizes.map(s => ({ 
+              productId: product.id, 
+              size: s.size, 
+              quantity: s.quantity !== undefined && s.quantity !== '' ? parseInt(s.quantity, 10) : 0 
+            }))
          });
       }
 

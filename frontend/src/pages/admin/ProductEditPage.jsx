@@ -131,13 +131,16 @@ const ProductEditPage = () => {
                 `${import.meta.env.VITE_API_URL}/api/products/${productId}`,
                 {
                     name,
-                    price,
+                    price: Number(price),
                     description,
                     category,
                     brand,
                     color,
                     material,
-                    sizes: validSizes,
+                    sizes: validSizes.map(s => ({
+                        size: s.size,
+                        quantity: Number(s.quantity)
+                    })),
                     images: { front: imageFront, side: imageSide, back: imageBack }
                 },
                 { headers: { Authorization: `Bearer ${userInfo.token}` } }
