@@ -235,10 +235,14 @@ const getMyOrders = async (req, res) => {
 // @route   GET /api/orders
 const getOrders = async (req, res) => {
   const orders = await prisma.order.findMany({
-    include: { user: { select: { id: true, name: true } } },
+    include: { user: { select: { id: true, name: true, email: true } } },
     orderBy: { createdAt: 'desc' }
   });
-  res.json(orders.map(o => ({ ...o, _id: o.id })));
+  res.json(orders.map(o => ({ 
+    ...o, 
+    _id: o.id, 
+    userId: o.user 
+  })));
 };
 
 // @desc    Get order by ID
